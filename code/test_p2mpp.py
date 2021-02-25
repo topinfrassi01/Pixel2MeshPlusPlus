@@ -13,7 +13,6 @@ from modules.models_p2mpp import MeshNet
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
-from utils.visualize import plot_scatter
 
 
 def main(cfg):

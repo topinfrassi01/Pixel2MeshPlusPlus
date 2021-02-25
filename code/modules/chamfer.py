@@ -1,4 +1,5 @@
 import tensorflow as tf
+#pylint: disable=no-name-in-module
 from tensorflow.python.framework import ops
 
 nn_distance_module = tf.load_op_library('./external/tf_nndistance_so.so')
@@ -26,6 +27,7 @@ def nn_distance(xyz1, xyz2):
 # return [tf.TensorShape([shape1.dims[0],shape1.dims[1]]),tf.TensorShape([shape1.dims[0],shape1.dims[1]]),
 # tf.TensorShape([shape2.dims[0],shape2.dims[1]]),tf.TensorShape([shape2.dims[0],shape2.dims[1]])]
 @ops.RegisterGradient('NnDistance')
+#pylint: disable=unused-argument
 def _nn_distance_grad(op, grad_dist1, grad_idx1, grad_dist2, grad_idx2):
     xyz1 = op.inputs[0]
     xyz2 = op.inputs[1]
@@ -38,21 +40,19 @@ def main():
     import numpy as np
     import random
     import time
-    # pylint: disable=no-name-in-module
-    from tensorflow.python.ops.gradient_checker import compute_gradient
 
     random.seed(100)
     np.random.seed(100)
     with tf.Session('') as sess:
         xyz1 = np.random.randn(32, 16384, 3).astype('float32')
         xyz2 = np.random.randn(32, 1024, 3).astype('float32')
-        # with tf.device('/gpu:0'):
-        if True:
-            inp1 = tf.Variable(xyz1)
-            inp2 = tf.constant(xyz2)
-            reta, retb, retc, retd = nn_distance(inp1, inp2)
-            loss = tf.reduce_sum(reta) + tf.reduce_sum(retc)
-            train = tf.train.GradientDescentOptimizer(learning_rate=0.05).minimize(loss)
+
+        inp1 = tf.Variable(xyz1)
+        inp2 = tf.constant(xyz2)
+        reta, _, retc, _1 = nn_distance(inp1, inp2)
+        loss = tf.reduce_sum(reta) + tf.reduce_sum(retc)
+        train = tf.train.GradientDescentOptimizer(learning_rate=0.05).minimize(loss)
+
         sess.run(tf.initialize_all_variables())
         t0 = time.time()
         t1 = t0
@@ -61,7 +61,7 @@ def main():
             trainloss, _ = sess.run([loss, train])
             newt = time.time()
             best = min(best, newt - t1)
-            i, trainloss, (newt - t0) / (i + 1), best
+            print(i, trainloss, (newt - t0) / (i + 1), best)
             t1 = newt
 # print sess.run([inp1,retb,inp2,retd])
 # grads=compute_gradient([inp1,inp2],[(16,32,3),(16,32,3)],loss,(1,),[xyz1,xyz2])

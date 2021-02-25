@@ -11,7 +11,7 @@ import tensorflow as tf
 from modules.chamfer import nn_distance
 from modules.config import execute
 
-
+# pylint: disable=unused-argument
 def f_score(points, labels, dist1, idx1, dist2, idx2, threshold):
     len_points = points.shape[0]
     len_labels = labels.shape[0]

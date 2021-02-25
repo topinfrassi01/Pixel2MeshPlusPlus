@@ -47,6 +47,7 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
     time_tag = datetime.datetime.now().strftime("%Y%m%d-%H-%M")
+    # TODO : Revoir les directories
     root_dir = os.path.join(cfg.save_path, cfg.name)
     model_dir = os.path.join(cfg.models_path, time_tag)
     log_dir = os.path.join(cfg.save_path, cfg.name, 'logs')

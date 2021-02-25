@@ -46,7 +46,7 @@ def main(cfg):
     }
 
     step = cfg.test_epoch
-    # Revoir les directory
+    # TODO : Revoir les directory
     model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
     predict_dir = os.path.join(cfg.save_path, cfg.name, 'coarse_intermediate', str(step))
     if not os.path.exists(predict_dir):

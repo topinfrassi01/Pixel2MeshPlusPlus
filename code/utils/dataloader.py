@@ -82,8 +82,12 @@ class DataFetcher(threading.Thread):
             self.queue.get()
 
 
-if __name__ == '__main__':
+def main():
     file_list = sys.argv[1]
-    data = DataFetcher(file_list)
+    data = DataFetcher(file_list, data_root=None, image_root=None)
     data.start()
     data.stopped = True
+
+
+if __name__ == '__main__':
+    main()
