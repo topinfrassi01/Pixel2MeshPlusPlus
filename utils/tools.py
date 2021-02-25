@@ -117,9 +117,10 @@ def camera_trans_inv(camera_metadata, xyz):
 
 
 def load_demo_image(demo_image_list):
-    imgs = np.zeros((3, 224, 224, 3))
+    imgs = np.zeros((len(demo_image_list), 224, 224, 3))
     for idx, demo_img_path in enumerate(demo_image_list):
         img = cv2.imread(demo_img_path, cv2.IMREAD_UNCHANGED)
+        
         if img.shape[2] == 4:
             img[np.where(img[:, :, 3] == 0)] = 255
         img = cv2.resize(img, (224, 224))
