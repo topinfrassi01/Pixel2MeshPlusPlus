@@ -2,10 +2,9 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import tensorflow as tf
-import tflearn
 
 from modules.inits import *
-from utils.tools import camera_trans, camera_trans_inv, reduce_var, reduce_std
+from utils.tools import camera_trans, camera_trans_inv, reduce_std
 
 _LAYER_UIDS = {}
 

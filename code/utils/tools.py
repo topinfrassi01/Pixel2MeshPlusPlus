@@ -83,7 +83,7 @@ def normal(v):
         return v
     return tf.divide(v, norm)
 
-
+# Here are the PoV's specifics : azimuth, elevation, in-plane rotation, distance, the field of view https://en.wikipedia.org/wiki/Horizontal_coordinate_system
 def cameraMat(param):
     theta = param[0] * np.pi / 180.0
     camy = param[3] * tf.sin(param[1] * np.pi / 180.0)

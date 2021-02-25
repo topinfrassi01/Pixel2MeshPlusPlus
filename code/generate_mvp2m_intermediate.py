@@ -66,6 +66,8 @@ def main(cfg):
     # ---------------------------------------------------------------
     print('=> initialize session')
     sesscfg = tf.ConfigProto()
+
+    #pylint: disable=no-member
     sesscfg.gpu_options.allow_growth = True
     sesscfg.allow_soft_placement = True
     sess = tf.Session(config=sesscfg)

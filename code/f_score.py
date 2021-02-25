@@ -27,16 +27,18 @@ def f_score(points, labels, dist1, idx1, dist2, idx2, threshold):
 
 def main():
     print('=> set config')
-    args = execute()
-    pprint.pprint(vars(args))
-    pred_file_list = os.path.join(args.save_path, args.name, 'predict', str(args.test_epoch), '*_predict.xyz')
+    cfg = execute()
+    pprint.pprint(vars(cfg))
+
+    pred_file_list = os.path.join(cfg.predictions_p2mpp_path, str(cfg.test_epoch), '*_predict.xyz')
     xyz_list_path = glob.glob(pred_file_list)
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
-    # exit(0)
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
     xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
     dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
     config = tf.ConfigProto()
+
+    #pylint: disable=no-member
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     sess = tf.Session(config=config)
@@ -68,20 +70,12 @@ def main():
         index += 1
         print('processed number', index, total_num)
 
-    print(sum_pred)
-    log_dir = os.path.join(args.save_path, args.name, 'logs')
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    log_path = os.path.join(log_dir, '{}_f_score.log'.format(args.test_epoch))
-    print(log_path)
-    logfile = open(log_path, 'a')
     means = []
     for item in length:
         number = length[item] + 1e-6
         score = sum_pred[item] / number
         means.append(score)
         print(item, name[item], length[item], ' '.join(map(str, score)))
-        print(item, name[item], length[item], ' '.join(map(str, score)), file=logfile)
     print('-' * 80)
     print('mean', 'all_data', 'total_number', np.mean(means, axis=0))
     sess.close()

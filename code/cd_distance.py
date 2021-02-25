@@ -12,24 +12,21 @@ from modules.config import execute
 
 if __name__ == '__main__':
     print('=> set config')
-    args = execute()
-    pprint.pprint(vars(args))
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
+    cfg = execute()
+    pprint.pprint(vars(cfg))
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
     xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
     dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
     config = tf.ConfigProto()
+
+    #pylint: disable=no-member
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     sess = tf.Session(config=config)
 
-    pred_file_list = os.path.join(args.save_path, args.name, 'predict', str(args.test_epoch), '*_predict.xyz')
+    pred_file_list = os.path.join(cfg.predictions_p2mpp_path, str(cfg.test_epoch), '*_predict.xyz')
     xyz_list_path = glob.glob(pred_file_list)
-
-    log_dir = os.path.join(args.save_path, args.name, 'logs')
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    log_path = os.path.join(log_dir, '{}_cd.log'.format(args.test_epoch))
 
     name = {'02828884': 'bench', '03001627': 'chair', '03636649': 'lamp', '03691459': 'speaker', '04090263': 'firearm',
             '04379243': 'table', '04530566': 'watercraft', '02691156': 'plane', '02933112': 'cabinet',
@@ -56,11 +53,8 @@ if __name__ == '__main__':
         index += 1
         print('processed number', index, total_num)
 
-    print(log_path)
-    log = open(log_path, 'a')
     for item in length:
         number = length[item] + 1e-6
         score = (sum_pred[item] / number) * 10000
         print(item, name[item], int(length[item]), score)
-        print(item, name[item], int(length[item]), score, file=log)
     sess.close()
