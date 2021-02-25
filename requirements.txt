@@ -4,3 +4,4 @@ tflearn==0.3.2
 opencv-python
 pyyaml
 scipy
+matplotlib
