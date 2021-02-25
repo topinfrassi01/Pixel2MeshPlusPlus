@@ -2,13 +2,11 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import os
-import sys
-import numpy as np
-import pickle as pickle
-import tensorflow as tf
 import pprint
 import glob
-import os
+import numpy as np
+import tensorflow as tf
+
 from modules.chamfer import nn_distance
 from modules.config import execute
 

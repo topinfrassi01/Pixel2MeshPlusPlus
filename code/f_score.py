@@ -2,13 +2,12 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import os
-import sys
-import numpy as np
-import pickle as pickle
-import tensorflow as tf
 import pprint
 import glob
-import os
+
+import numpy as np
+import tensorflow as tf
+
 from modules.chamfer import nn_distance
 from modules.config import execute
 
@@ -17,17 +16,16 @@ def f_score(points, labels, dist1, idx1, dist2, idx2, threshold):
     len_points = points.shape[0]
     len_labels = labels.shape[0]
 
-    f_score = []
+    f_scores = []
     for i in range(len(threshold)):
         num = len(np.where(dist1 <= threshold[i])[0]) + 0.0
         P = 100.0 * (num / len_points)
         num = len(np.where(dist2 <= threshold[i])[0]) + 0.0
         R = 100.0 * (num / len_labels)
-        f_score.append((2 * P * R) / (P + R + 1e-6))
-    return np.array(f_score)
+        f_scores.append((2 * P * R) / (P + R + 1e-6))
+    return np.array(f_scores)
 
-
-if __name__ == '__main__':
+def main():
     print('=> set config')
     args = execute()
     pprint.pprint(vars(args))
@@ -87,3 +85,7 @@ if __name__ == '__main__':
     print('-' * 80)
     print('mean', 'all_data', 'total_number', np.mean(means, axis=0))
     sess.close()
+
+
+if __name__ == '__main__':
+    main()

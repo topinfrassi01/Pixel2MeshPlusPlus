@@ -1,13 +1,14 @@
 # Copyright (C) 2019 Chao Wen, Yinda Zhang, Zhuwen Li, Yanwei Fu
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
+import os
+from datetime import datetime
+import pprint
+import pickle
+
 import tensorflow as tf
 import tflearn
 import numpy as np
-import pprint
-import pickle
-import shutil
-import os
 
 from modules.models_p2mpp import MeshNet
 from modules.config import execute
@@ -45,9 +46,9 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
-
+    time_tag = datetime.datetime.now().strftime("%Y%m%d-%H-%M")
     root_dir = os.path.join(cfg.save_path, cfg.name)
-    model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
+    model_dir = os.path.join(cfg.models_path, time_tag)
     log_dir = os.path.join(cfg.save_path, cfg.name, 'logs')
     plt_dir = os.path.join(cfg.save_path, cfg.name, 'plt')
     if not os.path.exists(root_dir):
@@ -118,7 +119,7 @@ def main(cfg):
             feed_dict.update({placeholders['labels']: labels})
             feed_dict.update({placeholders['cameras']: poses})
             # ---------------------------------------------------------------
-            _, dists, summaries, out1l, out2l = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1l, model.output2l], feed_dict=feed_dict)
+            _, dists, summaries, _1, out2l = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1l, model.output2l], feed_dict=feed_dict)
             # ---------------------------------------------------------------
             all_loss[iters] = dists
             mean_loss = np.mean(all_loss[np.where(all_loss)])

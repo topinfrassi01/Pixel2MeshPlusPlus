@@ -1,15 +1,15 @@
 # Copyright (C) 2019 Chao Wen, Yinda Zhang, Zhuwen Li, Yanwei Fu
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
+import pprint
+import pickle
+import os
+
 import tensorflow as tf
 import tflearn
 import numpy as np
-import pprint
-import pickle
-import shutil
-import os
 
-from modules.models_mvp2m import MeshNetMVP2M
+from modules.models_p2mpp import MeshNet
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
@@ -47,7 +47,7 @@ def main(cfg):
     }
 
     step = cfg.test_epoch
-    root_dir = os.path.join(cfg.save_path, cfg.name)
+    # TODO : Revoir les directory
     model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
     predict_dir = os.path.join(cfg.save_path, cfg.name, 'predict', str(step))
     if not os.path.exists(predict_dir):
@@ -56,10 +56,11 @@ def main(cfg):
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
-    model = MeshNetMVP2M(placeholders, logging=True, args=cfg)
+    model = MeshNet(placeholders, logging=True, args=cfg)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.test_file_path, data_root=cfg.test_data_path, image_root=cfg.test_image_path, is_val=True)
+    data = DataFetcher(file_list=cfg.test_file_path, data_root=cfg.test_data_path,
+                       image_root=cfg.test_image_path, is_val=True, mesh_root=cfg.test_mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
@@ -79,16 +80,17 @@ def main(cfg):
     # ---------------------------------------------------------------
     test_number = data.number
     tflearn.is_training(False, sess)
-    print('=> start test stage 1')
+    print('=> start test stage 2')
     for iters in range(test_number):
         # Fetch training data
         # need [img, label, pose(camera meta data), dataID]
         img_all_view, labels, poses, data_id, mesh = data.fetch()
         feed_dict.update({placeholders['img_inp']: img_all_view})
+        feed_dict.update({placeholders['features']: mesh})
         feed_dict.update({placeholders['labels']: labels})
         feed_dict.update({placeholders['cameras']: poses})
         # ---------------------------------------------------------------
-        out1, out2, out3 = sess.run([model.output1, model.output2, model.output3], feed_dict=feed_dict)
+        _1, out2l = sess.run([model.output1l, model.output2l], feed_dict=feed_dict)
         # ---------------------------------------------------------------
         # save GT
         label_path = os.path.join(predict_dir, data_id.replace('.dat', '_ground.xyz'))
@@ -101,7 +103,7 @@ def main(cfg):
         # np.savetxt(out2_path, out2)
         # save 3
         out3_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict.xyz'))
-        np.savetxt(out3_path, out3)
+        np.savetxt(out3_path, out2l)
 
         print('Iteration {}/{}, Data id {}'.format(iters + 1, test_number, data_id))
 

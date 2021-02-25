@@ -1,0 +1,252 @@
+{
+  "formatVersion": 3,
+  "id": "root",
+  "ideas": {
+    "1": {
+      "title": "Pix2Mesh++",
+      "id": 1,
+      "attr": {
+        "position": [
+          -79,
+          -24,
+          1
+        ]
+      },
+      "ideas": {
+        "1": {
+          "title": "Données d'entrée",
+          "id": 4,
+          "ideas": {
+            "1": {
+              "title": "Images -> Coarse",
+              "id": 34
+            },
+            "2": {
+              "title": "Images + Coarse -> refine",
+              "id": 35
+            },
+            "3": {
+              "title": "Modèle initial",
+              "id": 36
+            },
+            "4": {
+              "title": "Calibration de caméra",
+              "id": 40
+            }
+          },
+          "attr": {
+            "position": [
+              159,
+              -246,
+              10
+            ]
+          }
+        },
+        "11": {
+          "title": "Documentation",
+          "id": 11,
+          "attr": {
+            "position": [
+              161,
+              -82,
+              11
+            ]
+          }
+        },
+        "21": {
+          "title": "Résultats",
+          "id": 10,
+          "attr": {
+            "position": [
+              204,
+              113,
+              12
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Coarse 1,2,3",
+              "id": 33
+            },
+            "2": {
+              "title": "Refined",
+              "id": 39
+            }
+          }
+        },
+        "-11": {
+          "title": "Archives d'entraînement",
+          "id": 7,
+          "attr": {
+            "position": [
+              29,
+              -491,
+              7
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Tag de temps\nModèle\nTerminé ou pas\nRéussi\nBaseline?\n",
+              "id": 23,
+              "ideas": {
+                "1": {
+                  "title": "Logs",
+                  "id": 24,
+                  "attr": {}
+                },
+                "2": {
+                  "title": "Visualisation",
+                  "id": 25,
+                  "attr": {}
+                },
+                "3": {
+                  "title": "Modèles",
+                  "id": 26,
+                  "attr": {}
+                }
+              }
+            }
+          }
+        },
+        "-21": {
+          "title": "Code",
+          "id": 8,
+          "attr": {
+            "position": [
+              365,
+              -219,
+              8
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Code lié à tensorflow",
+              "id": 12,
+              "ideas": {
+                "1": {
+                  "title": "CUDA",
+                  "id": 45
+                },
+                "2": {
+                  "title": "Couches",
+                  "id": 46
+                },
+                "3": {
+                  "title": "Modèles",
+                  "id": 47
+                },
+                "4": {
+                  "title": "Fonction de coût",
+                  "id": 48
+                }
+              }
+            },
+            "2": {
+              "title": "Chargement de données",
+              "id": 13
+            },
+            "3": {
+              "title": "Exécutables",
+              "id": 14
+            },
+            "4": {
+              "title": "Utilitaires",
+              "id": 19
+            }
+          }
+        },
+        "0.5": {
+          "title": "Modèles de production",
+          "id": 6,
+          "attr": {
+            "position": [
+              141,
+              -457,
+              9
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Coarse p2mpp",
+              "id": 20
+            },
+            "2": {
+              "title": "Refine mvp2m",
+              "id": 21
+            },
+            "3": {
+              "title": "vgg16",
+              "id": 22
+            }
+          }
+        },
+        "-46": {
+          "title": "Configurations",
+          "id": 9,
+          "attr": {
+            "position": [
+              131,
+              57,
+              13
+            ]
+          },
+          "ideas": {
+            "1": {
+              "title": "Entraînement",
+              "id": 27
+            },
+            "2": {
+              "title": "Production",
+              "id": 28
+            },
+            "6": {
+              "title": "Développement",
+              "id": 37,
+              "ideas": {
+                "1": {
+                  "title": "Docker",
+                  "id": 30,
+                  "attr": {}
+                },
+                "2": {
+                  "title": "vscode",
+                  "id": 31,
+                  "attr": {}
+                },
+                "3": {
+                  "title": "git",
+                  "id": 32,
+                  "attr": {}
+                },
+                "4": {
+                  "title": "Python",
+                  "id": 49
+                }
+              }
+            },
+            "7": {
+              "title": "Données",
+              "id": 41,
+              "ideas": {
+                "1": {
+                  "title": "ex : Toutes les données",
+                  "id": 42
+                },
+                "2": {
+                  "title": "ex : Une seule classe",
+                  "id": 43
+                },
+                "3": {
+                  "title": "ex : Un seul objet",
+                  "id": 44
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "title": "Pix2Mesh++",
+  "links": []
+}

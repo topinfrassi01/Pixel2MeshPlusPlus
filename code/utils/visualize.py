@@ -1,13 +1,12 @@
 # Copyright (C) 2019 Chao Wen, Yinda Zhang, Zhuwen Li, Yanwei Fu
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 import matplotlib as mpl
 mpl.use('Agg')
-
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 
 def plot_scatter(pt, data_name, plt_path):
@@ -22,8 +21,6 @@ def plot_scatter(pt, data_name, plt_path):
     X = pt[:, 0]
     Y = pt[:, 1]
     Z = pt[:, 2]
-
-    scat = ax.scatter(X, Y, Z, depthshade=True, marker='.')
 
     max_range = np.array([X.max() - X.min(), Y.max() - Y.min(), Z.max() - Z.min()]).max() / 2.0
 

@@ -34,10 +34,11 @@ def _nn_distance_grad(op, grad_dist1, grad_idx1, grad_dist2, grad_idx2):
     return nn_distance_module.nn_distance_grad(xyz1, xyz2, grad_dist1, idx1, grad_dist2, idx2)
 
 
-if __name__ == '__main__':
+def main():
     import numpy as np
     import random
     import time
+    # pylint: disable=no-name-in-module
     from tensorflow.python.ops.gradient_checker import compute_gradient
 
     random.seed(100)
@@ -56,11 +57,10 @@ if __name__ == '__main__':
         t0 = time.time()
         t1 = t0
         best = 1e100
-        for i in xrange(100):
+        for i in range(100):
             trainloss, _ = sess.run([loss, train])
             newt = time.time()
             best = min(best, newt - t1)
-            print
             i, trainloss, (newt - t0) / (i + 1), best
             t1 = newt
 # print sess.run([inp1,retb,inp2,retd])
@@ -82,3 +82,7 @@ if __name__ == '__main__':
 # idx2=((xyz2[:,samples,None,:]-xyz1[:,None,:,:])**2).sum(axis=-1).argmin(axis=-1)
 # print np.abs(dist2-c[:,samples]).max()
 # print np.abs(idx2-d[:,samples]).max()
+
+
+if __name__ == '__main__':
+    main()

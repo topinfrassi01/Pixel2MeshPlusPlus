@@ -1,19 +1,14 @@
 # Copyright (C) 2019 Chao Wen, Yinda Zhang, Zhuwen Li, Yanwei Fu
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
-import numpy as np
 import pickle
-import scipy.sparse as sp
-import networkx as nx
 import threading
 import queue
 import sys
-import cv2
-import math
-import time
 import os
-import glob
 
+import cv2
+import numpy as np
 
 np.random.seed(123)
 
