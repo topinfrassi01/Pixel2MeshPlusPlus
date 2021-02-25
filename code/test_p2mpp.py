@@ -19,7 +19,7 @@ def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     # ---------------------------------------------------------------
     # Set random seed
-    print('=> pre-porcessing')
+    print('=> pre-processing')
     seed = 123
     np.random.seed(seed)
     tf.set_random_seed(seed)

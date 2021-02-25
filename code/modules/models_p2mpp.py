@@ -4,7 +4,6 @@
 import tensorflow as tf
 import tflearn
 import os
-import tensorflow.contrib.layers as tfcontriblayers
 
 from modules.losses import mesh_loss_2, laplace_loss_2
 from modules.layers import LocalGraphProjection, SampleHypothesis, DeformationReasoning

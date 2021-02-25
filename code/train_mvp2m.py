@@ -2,6 +2,7 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import pprint
+from datetime import datetime
 import pickle
 import os
 
@@ -20,7 +21,7 @@ def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     # ---------------------------------------------------------------
     # Set random seed
-    print('=> pre-porcessing')
+    print('=> pre-processing')
     seed = 123
     np.random.seed(seed)
     tf.set_random_seed(seed)
@@ -45,6 +46,7 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
+    # Définition de l'arborescence de dossiers
     # TODO : Revoir les directories
     root_dir = os.path.join(cfg.save_path, cfg.name)
     model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
@@ -63,15 +65,20 @@ def main(cfg):
         os.mkdir(plt_dir)
         print('==> make plt dir {}'.format(plt_dir))
     summaries_dir = os.path.join(cfg.save_path, cfg.name, 'summaries')
+
+    # Log d'entraînement
     train_loss = open('{}/train_loss_record.txt'.format(log_dir), 'a')
     train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.name, cfg.lr))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
+    # TODO : Les modèles sont différents
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.train_file_path, data_root=cfg.train_data_path, image_root=cfg.train_image_path, is_val=False)
+
+    data = DataFetcher(file_list=cfg.train_file_path, 
+                        data_root=cfg.train_data_path, image_root=cfg.train_image_path, is_val=False)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
@@ -83,6 +90,7 @@ def main(cfg):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter(summaries_dir, sess.graph, filename_suffix='train')
     # ---------------------------------------------------------------
+    # TODO : Étape de restoration, différents entre les deux
     if cfg.restore:
         print('=> load model')
         model.load(sess=sess, ckpt_path=model_dir, step=cfg.init_epoch)
@@ -112,6 +120,7 @@ def main(cfg):
             feed_dict.update({placeholders['labels']: labels})
             feed_dict.update({placeholders['cameras']: poses})
             # ---------------------------------------------------------------
+            # TODO : Output différent
             _1, dists, summaries, _2, _3, out3 = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1, model.output2, model.output3], feed_dict=feed_dict)
             # ---------------------------------------------------------------
             all_loss[iters] = dists

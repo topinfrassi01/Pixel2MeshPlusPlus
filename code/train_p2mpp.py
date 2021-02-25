@@ -21,7 +21,7 @@ def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
     # ---------------------------------------------------------------
     # Set random seed
-    print('=> pre-porcessing')
+    print('=> pre-processing')
     seed = 123
     np.random.seed(seed)
     tf.set_random_seed(seed)
@@ -46,10 +46,10 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
-    time_tag = datetime.datetime.now().strftime("%Y%m%d-%H-%M")
+    # Définition de l'arborescence de dossiers
     # TODO : Revoir les directories
     root_dir = os.path.join(cfg.save_path, cfg.name)
-    model_dir = os.path.join(cfg.models_path, time_tag)
+    model_dir = cfg.models_path
     log_dir = os.path.join(cfg.save_path, cfg.name, 'logs')
     plt_dir = os.path.join(cfg.save_path, cfg.name, 'plt')
     if not os.path.exists(root_dir):
@@ -65,14 +65,18 @@ def main(cfg):
         os.mkdir(plt_dir)
         print('==> make plt dir {}'.format(plt_dir))
     summaries_dir = os.path.join(cfg.save_path, cfg.name, 'summaries')
+
+    # Log d'entraînement
     train_loss = open('{}/train_loss_record.txt'.format(log_dir), 'a')
     train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.name, cfg.lr))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
+    # TODO : Les modèles sont différents
     model = MeshNet(placeholders, logging=True, args=cfg)
     # ---------------------------------------------------------------
     print('=> load data')
+    # TODO : mesh_root en plus ici
     data = DataFetcher(file_list=cfg.train_file_path, data_root=cfg.train_data_path,
                        image_root=cfg.train_image_path, is_val=False, mesh_root=cfg.train_mesh_root)
     data.setDaemon(True)
@@ -86,6 +90,7 @@ def main(cfg):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter(summaries_dir, sess.graph, filename_suffix='train')
     # ---------------------------------------------------------------
+    # TODO : Étape de restoration, différents entre les deux
     if cfg.load_cnn:
         print('=> load pre-trained cnn')
         model.loadcnn(sess=sess, ckpt_path=cfg.pre_trained_cnn_path, step=cfg.cnn_step)
@@ -115,6 +120,7 @@ def main(cfg):
             # Fetch training data
             # need [img, label, pose(camera meta data), dataID]
             img_all_view, labels, poses, data_id, mesh = data.fetch()
+            # TODO : Features en plus
             feed_dict.update({placeholders['features']: mesh})
             feed_dict.update({placeholders['img_inp']: img_all_view})
             feed_dict.update({placeholders['labels']: labels})

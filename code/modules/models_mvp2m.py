@@ -4,7 +4,6 @@
 import tensorflow as tf
 import tflearn
 import os
-import tensorflow.contrib.layers as tfcontriblayers
 
 from modules.losses import mesh_loss, laplace_loss
 from modules.layers import GraphConvolution, GraphPooling, GraphProjection
