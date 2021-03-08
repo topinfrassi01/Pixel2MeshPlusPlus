@@ -2,8 +2,7 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import argparse
-import yaml
-import re
+from envyaml import EnvYAML
 
 
 def str2bool(v):
@@ -66,23 +65,10 @@ def create_parser():
 def parse_args(parser):
     args = parser.parse_args()
     if args.config_file:
-        loader = yaml.SafeLoader
-        loader.add_implicit_resolver(
-            u'tag:yaml.org,2002:float',
-            re.compile(u'''^(?:
-        [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
-        |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
-        |\\.[0-9_]+(?:[eE][-+][0-9]+)?
-        |[-+]?[0-9][0-9_]*(?::[0-5]?[0-9])+\\.[0-9_]*
-        |[-+]?\\.(?:inf|Inf|INF)
-        |\\.(?:nan|NaN|NAN))$''', re.X),
-            list(u'-+0123456789.'))
-        data = yaml.load(args.config_file, Loader=loader)
+        data = EnvYAML(args.config_file)
         delattr(args, 'config_file')
         arg_dict = args.__dict__
-        # print(len(list(arg_dict.keys())))
-        # print(len(list(data.keys())))
-        for key, value in arg_dict.items():
+        for key, _ in arg_dict.items():
             default_arg = parser.get_default(key)
             if arg_dict[key] == default_arg and key in data:
                 arg_dict[key] = data[key]

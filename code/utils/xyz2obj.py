@@ -15,6 +15,6 @@ if __name__ == '__main__':
         print(xyz)
         obj_path = xyz.replace('.xyz', '.obj')
         xyzf = np.loadtxt(os.path.join(xyz_list_path, xyz))
-        face = np.loadtxt('/pix2mesh/Pixel2MeshPlusPlus/prior_data/face3.obj', dtype='|S32')
+        face = np.loadtxt(os.path.join(os.environ["P2MPP_DIR"], '/Pixel2MeshPlusPlus/prior_data/face3.obj'), dtype='|S32')
         out = np.vstack((np.hstack((v, xyzf)), face))
         np.savetxt(os.path.join(xyz_list_path, obj_path), out, fmt='%s', delimiter=' ')

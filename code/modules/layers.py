@@ -20,7 +20,7 @@ def get_layer_uid(layer_name=''):
 
 
 def sparse_dropout(x, keep_prob, noise_shape):
-    """Dropout for sparse tensors."""
+    """Dropout for sparse tensors.""" 
     random_tensor = keep_prob
     random_tensor += tf.random_uniform(noise_shape)
     dropout_mask = tf.cast(tf.floor(random_tensor), dtype=tf.bool)
