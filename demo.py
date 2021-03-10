@@ -1,11 +1,13 @@
 # Copyright (C) 2019 Chao Wen, Yinda Zhang, Zhuwen Li, Yanwei Fu
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
+import os
 import tensorflow as tf
+from tensorflow.python.util import deprecation
+deprecation._PRINT_DEPRECATION_WARNINGS = False
 import tflearn
 import numpy as np
 import pickle
-import os
 
 from modules.models_mvp2m import MeshNetMVP2M as MVP2MNet
 from modules.models_p2mpp import MeshNet as P2MPPNet

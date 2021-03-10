@@ -63,7 +63,7 @@ def mesh_loss(pred, placeholders, block_id):
 def sample(pred, placeholders, block_id):
     uni = tf.distributions.Uniform(low=0.0, high=1.0)
     faces = placeholders['faces_triangle'][block_id - 1]
-    tilefaces = tf.py_func(choice_faces, [pred, faces], tf.int32)
+    tilefaces = tf.py_function(choice_faces, [pred, faces], tf.int32)
 
     num_of_tile_faces = tf.shape(tilefaces)[0]
 

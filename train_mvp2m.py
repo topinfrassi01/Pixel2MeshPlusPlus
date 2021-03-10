@@ -2,6 +2,8 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import tensorflow as tf
+from tensorflow.python.util import deprecation
+deprecation._PRINT_DEPRECATION_WARNINGS = False
 import tflearn
 import numpy as np
 import pprint
