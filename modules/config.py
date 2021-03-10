@@ -4,6 +4,7 @@
 import argparse
 import yaml
 import re
+import os
 
 
 def str2bool(v):
@@ -62,6 +63,17 @@ def create_parser():
     parser.add_argument('--cnn_step', type=int, help='cnn pre-trained step')
     return parser
 
+env_matcher = re.compile(r'\$\{([^}^{]+)\}')
+def env_constructor(loader, node):
+    ''' Extract the matched value, expand env variable, and replace the match '''
+    value = node.value
+    match = env_matcher.match(value)
+    env_var = match.group()[2:-1]
+
+    if os.environ.get(env_var) is None:
+        raise Exception("Expected {0} environment variable to be set.".format(env_var))
+
+    return os.environ.get(env_var) + value[match.end():]
 
 def parse_args(parser):
     args = parser.parse_args()
@@ -77,13 +89,17 @@ def parse_args(parser):
         |[-+]?\\.(?:inf|Inf|INF)
         |\\.(?:nan|NaN|NAN))$''', re.X),
             list(u'-+0123456789.'))
+        loader.add_implicit_resolver('!env', env_matcher, None)
+        loader.add_constructor('!env', env_constructor)
+
         data = yaml.load(args.config_file, Loader=loader)
         delattr(args, 'config_file')
         arg_dict = args.__dict__
-        # print(len(list(arg_dict.keys())))
-        # print(len(list(data.keys())))
         for key, value in arg_dict.items():
             default_arg = parser.get_default(key)
             if arg_dict[key] == default_arg and key in data:
                 arg_dict[key] = data[key]
+
+    print(args)
+    exit(0)
     return args
