@@ -3,16 +3,11 @@
 # This code is licensed under BSD 3-Clause License.
 import numpy as np
 import pickle
-import scipy.sparse as sp
-import networkx as nx
 import threading
 import queue
 import sys
 import cv2
-import math
-import time
 import os
-import glob
 
 
 np.random.seed(123)
@@ -87,7 +82,7 @@ class DataFetcher(threading.Thread):
             self.queue.get()
 
 
-if __name__ == '__main__':
+def main():
     file_list = sys.argv[1]
     data = DataFetcher(file_list)
     data.start()

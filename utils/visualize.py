@@ -7,8 +7,6 @@ import os
 import matplotlib as mpl
 mpl.use('Agg')
 
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
 
 def plot_scatter(pt, data_name, plt_path):
     fig = plt.figure()
@@ -23,7 +21,7 @@ def plot_scatter(pt, data_name, plt_path):
     Y = pt[:, 1]
     Z = pt[:, 2]
 
-    scat = ax.scatter(X, Y, Z, depthshade=True, marker='.')
+    _ = ax.scatter(X, Y, Z, depthshade=True, marker='.')
 
     max_range = np.array([X.max() - X.min(), Y.max() - Y.min(), Z.max() - Z.min()]).max() / 2.0
 

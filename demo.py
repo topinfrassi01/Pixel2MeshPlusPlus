@@ -4,17 +4,13 @@
 import tensorflow as tf
 import tflearn
 import numpy as np
-import pprint
 import pickle
-import shutil
 import os
 
 from modules.models_mvp2m import MeshNetMVP2M as MVP2MNet
 from modules.models_p2mpp import MeshNet as P2MPPNet
 from modules.config import execute
-# from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict, load_demo_image
-# from utils.visualize import plot_scatter
 
 
 def main(cfg):
@@ -47,14 +43,8 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    # step = cfg.test_epoch
-    # root_dir = os.path.join(cfg.save_path, cfg.name)
     model1_dir = os.path.join('results', 'coarse_mvp2m', 'models')
     model2_dir = os.path.join('results', 'refine_p2mpp', 'models')
-    # predict_dir = os.path.join(cfg.save_path, cfg.name, 'predict', str(step))
-    # if not os.path.exists(predict_dir):
-    #     os.makedirs(predict_dir)
-    #     print('==> make predict_dir {}'.format(predict_dir))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
@@ -67,22 +57,17 @@ def main(cfg):
                      'data/demo/plane3.png']
     img_all_view = load_demo_image(demo_img_list)
     cameras = np.loadtxt('data/demo/cameras.txt')
-    # data = DataFetcher(file_list=cfg.test_file_path, data_root=cfg.test_data_path, image_root=cfg.test_image_path, is_val=True)
-    # data.setDaemon(True)
-    # data.start()
     # ---------------------------------------------------------------
     print('=> initialize session')
     sesscfg = tf.ConfigProto()
+    #pylint: disable=no-member
     sesscfg.gpu_options.allow_growth = True
     sesscfg.allow_soft_placement = True
     sess = tf.Session(config=sesscfg)
     sess.run(tf.global_variables_initializer())
-    # sess2 = tf.Session(config=sesscfg)
-    # sess2.run(tf.global_variables_initializer())
     # ---------------------------------------------------------------
     model1.load(sess=sess, ckpt_path=model1_dir, step=50)
     model2.load(sess=sess, ckpt_path=model2_dir, step=10)
-    # exit(0)
     # ---------------------------------------------------------------
     # Load init ellipsoid and info about vertices and edges
     pkl = pickle.load(open('data/iccv_p2mpp.dat', 'rb'))
@@ -111,5 +96,4 @@ def main(cfg):
 if __name__ == '__main__':
     print('=> set config')
     args=execute()
-    # pprint.pprint(vars(args))
     main(args)

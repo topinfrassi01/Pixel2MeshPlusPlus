@@ -3,7 +3,6 @@
 # This code is licensed under BSD 3-Clause License.
 import numpy as np
 import tensorflow as tf
-import pickle
 import cv2
 
 

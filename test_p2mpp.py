@@ -6,14 +6,12 @@ import tflearn
 import numpy as np
 import pprint
 import pickle
-import shutil
 import os
 
 from modules.models_p2mpp import MeshNet
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
-from utils.visualize import plot_scatter
 
 
 def main(cfg):
@@ -47,7 +45,6 @@ def main(cfg):
     }
 
     step = cfg.test_epoch
-    root_dir = os.path.join(cfg.save_path, cfg.name)
     model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
     predict_dir = os.path.join(cfg.save_path, cfg.name, 'predict', str(step))
     if not os.path.exists(predict_dir):
@@ -66,6 +63,7 @@ def main(cfg):
     # ---------------------------------------------------------------
     print('=> initialize session')
     sesscfg = tf.ConfigProto()
+    #pylint: disable=no-member
     sesscfg.gpu_options.allow_growth = True
     sesscfg.allow_soft_placement = True
     sess = tf.Session(config=sesscfg)
@@ -90,7 +88,7 @@ def main(cfg):
         feed_dict.update({placeholders['labels']: labels})
         feed_dict.update({placeholders['cameras']: poses})
         # ---------------------------------------------------------------
-        out1l, out2l = sess.run([model.output1l, model.output2l], feed_dict=feed_dict)
+        _, out2l = sess.run([model.output1l, model.output2l], feed_dict=feed_dict)
         # ---------------------------------------------------------------
         # save GT
         label_path = os.path.join(predict_dir, data_id.replace('.dat', '_ground.xyz'))

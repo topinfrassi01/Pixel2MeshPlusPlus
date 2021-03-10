@@ -2,13 +2,10 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import os
-import sys
 import numpy as np
-import pickle as pickle
 import tensorflow as tf
 import pprint
 import glob
-import os
 from modules.chamfer import nn_distance
 from modules.config import execute
 
@@ -21,6 +18,8 @@ if __name__ == '__main__':
     xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
     dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
     config = tf.ConfigProto()
+
+    #pylint: disable=no-member
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     sess = tf.Session(config=config)

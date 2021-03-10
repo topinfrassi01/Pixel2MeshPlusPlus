@@ -6,7 +6,6 @@ import tflearn
 import numpy as np
 import pprint
 import pickle
-import shutil
 import os
 
 from modules.models_p2mpp import MeshNet
@@ -78,6 +77,7 @@ def main(cfg):
     # ---------------------------------------------------------------
     print('=> initialize session')
     sesscfg = tf.ConfigProto()
+    #pylint: disable=no-member
     sesscfg.gpu_options.allow_growth = True
     sesscfg.allow_soft_placement = True
     sess = tf.Session(config=sesscfg)
@@ -118,7 +118,7 @@ def main(cfg):
             feed_dict.update({placeholders['labels']: labels})
             feed_dict.update({placeholders['cameras']: poses})
             # ---------------------------------------------------------------
-            _, dists, summaries, out1l, out2l = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1l, model.output2l], feed_dict=feed_dict)
+            _, dists, summaries, _1, out2l = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1l, model.output2l], feed_dict=feed_dict)
             # ---------------------------------------------------------------
             all_loss[iters] = dists
             mean_loss = np.mean(all_loss[np.where(all_loss)])
