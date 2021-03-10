@@ -100,6 +100,4 @@ def parse_args(parser):
             if arg_dict[key] == default_arg and key in data:
                 arg_dict[key] = data[key]
 
-    print(args)
-    exit(0)
     return args
