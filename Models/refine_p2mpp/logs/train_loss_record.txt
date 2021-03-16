@@ -1,1 +1,0 @@
-Net refine_p2mpp | Start training | lr =  1e-05
