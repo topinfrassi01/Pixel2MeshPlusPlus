@@ -1,0 +1,9 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--disable=C",
+        "--extension-pkg-whitelist=cv2",
+        "--ignore-patterns=**/external/"
+    ]
+}
