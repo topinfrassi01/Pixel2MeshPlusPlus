@@ -1,5 +1,6 @@
-source/**__pycache__
+**__pycache__**
 results_train/*
+results_misc/*
 results_test/*
 results_coarse/*
 data/*

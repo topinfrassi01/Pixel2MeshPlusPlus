@@ -4,6 +4,9 @@ train_models_path: ${P2MPP_DIR}/data/ShapeNet/Models/train
 test_models_path: ${P2MPP_DIR}/data/ShapeNet/Models/test
 images_path: ${P2MPP_DIR}/data/ShapeNet/Images
 models_path: ${P2MPP_DIR}/models
+
+misc_results_path: ${P2MPP_DIR}/results_misc
+
 mvp2m: 
   lr: 1e-5
   init_epoch: 0
