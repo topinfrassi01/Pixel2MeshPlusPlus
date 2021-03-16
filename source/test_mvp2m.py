@@ -47,19 +47,19 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    step = cfg.test_epoch
-    model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
-    predict_dir = os.path.join(cfg.save_path, cfg.name, 'predict', str(step))
+    step = cfg.mvp2m.test_epoch
+    model_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name, 'models')
+    predict_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name, 'predict', str(step))
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
-    model = MeshNetMVP2M(placeholders, logging=True, args=cfg)
+    model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.test_file_path, data_root=cfg.test_data_path, image_root=cfg.test_image_path, is_val=True)
+    data = DataFetcher(file_list=cfg.mvp2m.test_file_path, data_root=cfg.mvp2m.test_data_path, image_root=cfg.mvp2m.test_image_path, is_val=True)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------

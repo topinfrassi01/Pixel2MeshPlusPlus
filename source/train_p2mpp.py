@@ -45,10 +45,10 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    root_dir = os.path.join(cfg.save_path, cfg.name)
-    model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
-    log_dir = os.path.join(cfg.save_path, cfg.name, 'logs')
-    plt_dir = os.path.join(cfg.save_path, cfg.name, 'plt')
+    root_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name)
+    model_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'models')
+    log_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'logs')
+    plt_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'plt')
     if not os.path.exists(root_dir):
         os.mkdir(root_dir)
         print('==> make root dir {}'.format(root_dir))
@@ -61,17 +61,17 @@ def main(cfg):
     if not os.path.exists(plt_dir):
         os.mkdir(plt_dir)
         print('==> make plt dir {}'.format(plt_dir))
-    summaries_dir = os.path.join(cfg.save_path, cfg.name, 'summaries')
+    summaries_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'summaries')
     train_loss = open('{}/train_loss_record.txt'.format(log_dir), 'a')
-    train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.name, cfg.lr))
+    train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.p2mpp.name, cfg.p2mpp.lr))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
-    model = MeshNet(placeholders, logging=True, args=cfg)
+    model = MeshNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.train_file_path, data_root=cfg.train_data_path,
-                       image_root=cfg.train_image_path, is_val=False, mesh_root=cfg.train_mesh_root)
+    data = DataFetcher(file_list=cfg.p2mpp.train_file_path, data_root=cfg.p2mpp.train_data_path,
+                       image_root=cfg.p2mpp.train_image_path, is_val=False, mesh_root=cfg.p2mpp.train_mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------

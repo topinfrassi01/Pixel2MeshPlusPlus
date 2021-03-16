@@ -47,10 +47,10 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    root_dir = os.path.join(cfg.save_path, cfg.name)
-    model_dir = os.path.join(cfg.save_path, cfg.name, 'models')
-    log_dir = os.path.join(cfg.save_path, cfg.name, 'logs')
-    plt_dir = os.path.join(cfg.save_path, cfg.name, 'plt')
+    root_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name)
+    model_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'models')
+    log_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'logs')
+    plt_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'plt')
     if not os.path.exists(root_dir):
         os.mkdir(root_dir)
         print('==> make root dir {}'.format(root_dir))
@@ -63,9 +63,9 @@ def main(cfg):
     if not os.path.exists(plt_dir):
         os.mkdir(plt_dir)
         print('==> make plt dir {}'.format(plt_dir))
-    summaries_dir = os.path.join(cfg.save_path, cfg.name, 'summaries')
+    summaries_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'summaries')
     train_loss = open('{}/train_loss_record.txt'.format(log_dir), 'a')
-    train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.name, cfg.lr))
+    train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.p2mpp.name, cfg.p2mpp.lr))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
@@ -85,9 +85,9 @@ def main(cfg):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter(summaries_dir, sess.graph, filename_suffix='train')
     # ---------------------------------------------------------------
-    if cfg.restore:
+    if cfg.p2mpp.restore:
         print('=> load model')
-        model.load(sess=sess, ckpt_path=model_dir, step=cfg.init_epoch)
+        model.load(sess=sess, ckpt_path=model_dir, step=cfg.p2mpp.init_epoch)
     # ---------------------------------------------------------------
     # Load init ellipsoid and info about vertices and edges
     pkl = pickle.load(open('data/iccv_p2mpp.dat', 'rb'))
@@ -98,8 +98,8 @@ def main(cfg):
     step = 0
     tflearn.is_training(True, sess)
     print('=> start train stage 1')
-    for epoch in range(cfg.epochs):
-        current_epoch = epoch + 1 + cfg.init_epoch
+    for epoch in range(cfg.p2mpp.epochs):
+        current_epoch = epoch + 1 + cfg.p2mpp.init_epoch
         epoch_plt_dir = os.path.join(plt_dir, str(current_epoch))
         if not os.path.exists(epoch_plt_dir):
             os.mkdir(epoch_plt_dir)

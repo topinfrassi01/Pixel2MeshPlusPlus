@@ -46,22 +46,22 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    step = cfg.test_epoch
-    model_dir = os.path.join(cfg.save_path, cfg.name)
+    step = cfg.mvp2m.test_epoch
+    model_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name)
     print(model_dir)
-    predict_dir = os.path.join("results", cfg.name, 'coarse_intermediate', str(step))
+    predict_dir = os.path.join("results", cfg.mvp2m.name, 'coarse_intermediate', str(step))
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
-    model = MeshNetMVP2M(placeholders, logging=True, args=cfg)
+    model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.coarse_result_file_path,
-                       data_root=cfg.coarse_result_data_path,
-                       image_root=cfg.coarse_result_image_path, is_val=False)
+    data = DataFetcher(file_list=cfg.mvp2m.coarse_result_file_path,
+                       data_root=cfg.mvp2m.coarse_result_data_path,
+                       image_root=cfg.mvp2m.coarse_result_image_path, is_val=False)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
