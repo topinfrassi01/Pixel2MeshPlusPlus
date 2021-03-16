@@ -1,6 +1,6 @@
-.vscode
-.idea
-logs/*
-ckpt/*
-**__pycache__
-tmp
+Source/**__pycache__
+Train/*
+Test/*
+Data/*
+Archives/*
+!**/.gitkeep
