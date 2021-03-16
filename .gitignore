@@ -1,6 +1,7 @@
 source/**__pycache__
 train/*
 test/*
+coarse/*
 data/*
 models/*
 archives/*
