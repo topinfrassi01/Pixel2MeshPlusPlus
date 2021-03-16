@@ -6,6 +6,36 @@ import yaml
 import re
 import os
 
+class AttrDict(dict):
+    """ Nested Attribute Dictionary
+
+    A class to convert a nested Dictionary into an object with key-values
+    accessible using attribute notation (AttrDict.attribute) in addition to
+    key notation (Dict["key"]). This class recursively sets Dicts to objects,
+    allowing you to recurse into nested dicts (like: AttrDict.attr.attr)
+    """
+
+    def __init__(self, mapping=None):
+        super(AttrDict, self).__init__()
+        if mapping is not None:
+            for key, value in mapping.items():
+                self.__setitem__(key, value)
+
+    def __setitem__(self, key, value):
+        if isinstance(value, dict):
+            value = AttrDict(value)
+        super(AttrDict, self).__setitem__(key, value)
+        self.__dict__[key] = value  # for code completion in editors
+
+    def __getattr__(self, item):
+        try:
+            return self.__getitem__(item)
+            
+        except KeyError:
+            raise AttributeError(item)
+
+    __setattr__ = __setitem__
+
 
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -27,14 +57,17 @@ def create_parser():
     parser.add_argument('-f', '--config_file', dest='config_file', type=argparse.FileType(mode='r'))
 
     parser.add_argument('--images_path', help='images path')
-
-    parser.add_argument('--train_file_path', help='train file path')
-    parser.add_argument('--train_models_path', help='train models path')
     
+    parser.add_argument('--train_models_path', help='train models path')
+    parser.add_argument('--test_models_path', help='test data path')
+
+    parser.add_argument('--coarse_results_path', help='coarse models path')
+
+    parser.add_argument('--datalists_base_path')
     parser.add_argument('--coarse_result_file_path', help='coarse result file path')
 
     parser.add_argument('--test_file_path', help='test file path')
-    parser.add_argument('--test_models_path', help='test data path')
+    parser.add_argument('--train_file_path', help='train file path')
 
     parser.add_argument('--train_mesh_root', help='init mesh root path')
     parser.add_argument('--test_mesh_root', help='init mesh root path')
@@ -47,6 +80,7 @@ def create_parser():
     parser.add_argument('--feat_dim', type=int, default=2883, help='feat dim')
     parser.add_argument('--stage2_feat_dim', type=int, default=339, help='stage2 feat dim')
 
+    parser.add_argument('--predictions_path', help="Predictions path")
     parser.add_argument('--coord_dim', type=int, default=3, help='coord dim')
     parser.add_argument('-e', '--epochs', type=int, default=20, help='number of epochs')
     parser.add_argument('-g', '--gpu_id', help='devices ids')
@@ -91,7 +125,9 @@ def parse_args(parser):
         loader.add_implicit_resolver('!env', env_matcher, None)
         loader.add_constructor('!env', env_constructor)
 
-        data = yaml.load(args.config_file, Loader=loader)
+        #TODO : Come back here to fix this mess.
+        data = AttrDict(yaml.load(args.config_file, Loader=loader))
+
         delattr(args, 'config_file')
         arg_dict = args.__dict__
         for key, value in arg_dict.items():
@@ -99,4 +135,4 @@ def parse_args(parser):
             if arg_dict[key] == default_arg and key in data:
                 arg_dict[key] = data[key]
 
-    return args
+    return data

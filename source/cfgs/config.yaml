@@ -5,7 +5,9 @@ test_models_path: ${P2MPP_DIR}/data/ShapeNet/Models/test
 images_path: ${P2MPP_DIR}/data/ShapeNet/Images
 models_path: ${P2MPP_DIR}/models
 
+datalists_base_path: ${P2MPP_DIR}/datalists
 misc_results_path: ${P2MPP_DIR}/results_misc
+coarse_results_path: ${P2MPP_DIR}/results_coarse
 
 mvp2m: 
   lr: 1e-5
@@ -19,6 +21,12 @@ mvp2m:
   test_file_path: ${P2MPP_DIR}/datalists/test_list.txt
   coarse_result_file_path: ${P2MPP_DIR}/datalists/train_list.txt
   coarse_result_data_path: ${P2MPP_DIR}/ShapeNetModels/train
+  batch_size: 1
+  lr: 3e-5
+  seed: 123
+  hidden_dim: 192
+  stage2_feat_dim: 339
+  coord_dim: 3
 p2mpp:
   # 3 + 3*(512+256+128+64)
   feat_dim: 2883
@@ -33,6 +41,13 @@ p2mpp:
   lr: 1e-5
   epochs: 10
   init_epoch: 50
+  batch_size: 1
+  lr: 3e-5
+  seed: 123
+  test_epoch: 0
+  hidden_dim: 192
+  stage2_feat_dim: 339
+  coord_dim: 3
   restore: false
   train_file_path: ${P2MPP_DIR}/datalists/train_list.txt
   train_mesh_root: ${P2MPP_DIR}/results/coarse_mvp2m/coarse_intermediate/50

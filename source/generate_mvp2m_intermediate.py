@@ -9,12 +9,26 @@ import numpy as np
 import pprint
 import pickle
 import os
+from natsort import natsorted
+from pathlib import Path
 
 from modules.models_mvp2m import MeshNetMVP2M
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
 
+def get_most_recent_run(directory):
+    folders = list(filter(os.path.isdir, [Path(directory) / x for x in os.listdir(directory)]))
+
+    if len(folders) == 0:
+        raise Exception("Folder {0} is empty.".format(directory))
+
+    return natsorted(folders, reverse=True)[0]
+
+def create_run_name(prefix=None, suffix=None):
+    from datetime import datetime
+
+    return datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
 
 def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
@@ -45,21 +59,27 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
-
+    print(cfg)
     step = cfg.mvp2m.test_epoch
     model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
     print(model_dir)
-    predict_dir = os.path.join("results", cfg.mvp2m.name, 'coarse_intermediate', str(step))
+
+    data_list_path = os.path.join(cfg.datalists_base_path, get_most_recent_run(cfg.datalists_base_path), "train_list.txt")
+    print(data_list_path)
+
+    predict_dir = os.path.join(cfg.coarse_results_path, create_run_name())
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
+    
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
+    
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.mvp2m.coarse_result_file_path,
+    data = DataFetcher(file_list=data_list_path,
                        data_root=cfg.train_models_path,
                        image_root=cfg.images_path, is_val=False)
     data.setDaemon(True)

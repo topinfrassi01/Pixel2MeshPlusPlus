@@ -3,6 +3,7 @@ results_train/*
 results_misc/*
 results_test/*
 results_coarse/*
+datalists/*
 data/*
 models/*
 archives/*
