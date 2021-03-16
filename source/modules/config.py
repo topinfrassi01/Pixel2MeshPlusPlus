@@ -26,17 +26,15 @@ def create_parser():
     # g = parser.add_argument_group('Device Targets')
     parser.add_argument('-f', '--config_file', dest='config_file', type=argparse.FileType(mode='r'))
 
-    parser.add_argument('--train_file_path', help='train file path')
-    parser.add_argument('--train_data_path', help='train data path')
-    parser.add_argument('--train_image_path', help='train image path')
+    parser.add_argument('--images_path', help='images path')
 
+    parser.add_argument('--train_file_path', help='train file path')
+    parser.add_argument('--train_models_path', help='train models path')
+    
     parser.add_argument('--coarse_result_file_path', help='coarse result file path')
-    parser.add_argument('--coarse_result_data_path', help='coarse result data path')
-    parser.add_argument('--coarse_result_image_path', help='coarse result image path')
 
     parser.add_argument('--test_file_path', help='test file path')
-    parser.add_argument('--test_data_path', help='test data path')
-    parser.add_argument('--test_image_path', help='test image path')
+    parser.add_argument('--test_models_path', help='test data path')
 
     parser.add_argument('--train_mesh_root', help='init mesh root path')
     parser.add_argument('--test_mesh_root', help='init mesh root path')
@@ -52,6 +50,7 @@ def create_parser():
     parser.add_argument('--coord_dim', type=int, default=3, help='coord dim')
     parser.add_argument('-e', '--epochs', type=int, default=20, help='number of epochs')
     parser.add_argument('-g', '--gpu_id', help='devices ids')
+    parser.add_argument('-m', '--models_path', help='models path')
     parser.add_argument('-s', '--save_path', help='save root')
     parser.add_argument('-n', '--name', help='exprtiments name')
     parser.add_argument('--restore', type=str2bool, default=False)

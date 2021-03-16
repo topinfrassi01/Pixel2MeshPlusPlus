@@ -47,7 +47,7 @@ def main(cfg):
     }
 
     step = cfg.mvp2m.test_epoch
-    model_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name)
+    model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
     print(model_dir)
     predict_dir = os.path.join("results", cfg.mvp2m.name, 'coarse_intermediate', str(step))
     if not os.path.exists(predict_dir):
@@ -60,8 +60,8 @@ def main(cfg):
     # ---------------------------------------------------------------
     print('=> load data')
     data = DataFetcher(file_list=cfg.mvp2m.coarse_result_file_path,
-                       data_root=cfg.mvp2m.coarse_result_data_path,
-                       image_root=cfg.mvp2m.coarse_result_image_path, is_val=False)
+                       data_root=cfg.train_models_path,
+                       image_root=cfg.images_path, is_val=False)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------

@@ -46,7 +46,7 @@ def main(cfg):
     }
 
     root_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name)
-    model_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'models')
+    model_dir = os.path.join(cfg.models_path, cfg.p2mpp.name)
     log_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'logs')
     plt_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'plt')
     if not os.path.exists(root_dir):
@@ -70,8 +70,8 @@ def main(cfg):
     model = MeshNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.p2mpp.train_file_path, data_root=cfg.p2mpp.train_data_path,
-                       image_root=cfg.p2mpp.train_image_path, is_val=False, mesh_root=cfg.p2mpp.train_mesh_root)
+    data = DataFetcher(file_list=cfg.p2mpp.train_file_path, data_root=cfg.train_models_path,
+                       image_root=cfg.images_path, is_val=False, mesh_root=cfg.p2mpp.train_mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------

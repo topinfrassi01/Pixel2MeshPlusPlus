@@ -45,8 +45,8 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    model1_dir = os.path.join('models', 'coarse_mvp2m')
-    model2_dir = os.path.join('models', 'refine_p2mpp')
+    model1_dir = os.path.join(cfg.models_path, 'coarse_mvp2m')
+    model2_dir = os.path.join(cfg.models_path, 'refine_p2mpp')
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model

@@ -45,7 +45,7 @@ def main(cfg):
     }
 
     step = cfg.p2mpp.test_epoch
-    model_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'models')
+    model_dir = os.path.join(cfg.models_path, cfg.p2mpp.name)
     predict_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'predict', str(step))
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
@@ -56,8 +56,8 @@ def main(cfg):
     model = MeshNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.p2mpp.test_file_path, data_root=cfg.p2mpp.test_data_path,
-                       image_root=cfg.p2mpp.test_image_path, is_val=True, mesh_root=cfg.p2mpp.test_mesh_root)
+    data = DataFetcher(file_list=cfg.p2mpp.test_file_path, data_root=cfg.test_models_path,
+                       image_root=cfg.images_path, is_val=True, mesh_root=cfg.p2mpp.test_mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------

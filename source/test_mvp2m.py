@@ -48,7 +48,7 @@ def main(cfg):
     }
 
     step = cfg.mvp2m.test_epoch
-    model_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name, 'models')
+    model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
     predict_dir = os.path.join(cfg.mvp2m.save_path, cfg.mvp2m.name, 'predict', str(step))
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
@@ -59,7 +59,7 @@ def main(cfg):
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.mvp2m.test_file_path, data_root=cfg.mvp2m.test_data_path, image_root=cfg.mvp2m.test_image_path, is_val=True)
+    data = DataFetcher(file_list=cfg.mvp2m.test_file_path, data_root=cfg.test_models_path, image_root=cfg.images_path, is_val=True)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
