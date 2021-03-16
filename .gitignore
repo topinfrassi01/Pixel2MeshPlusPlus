@@ -1,6 +1,7 @@
-Source/**__pycache__
-Train/*
-Test/*
-Data/*
-Archives/*
+source/**__pycache__
+train/*
+test/*
+data/*
+models/*
+archives/*
 !**/.gitkeep
