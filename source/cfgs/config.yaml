@@ -7,8 +7,11 @@ models_path: ${P2MPP_DIR}/models
 
 datalists_base_path: ${P2MPP_DIR}/datalists
 misc_results_path: ${P2MPP_DIR}/results_misc
+train_results_path: ${P2MPP_DIR}/results_train
 coarse_results_path: ${P2MPP_DIR}/results_coarse
-data_list: ''
+
+data_list: 'only_sofas'
+coarse_experiment_name: 'only_sofas_20210317-163507'
 
 mvp2m: 
   lr: 1e-5
@@ -18,10 +21,9 @@ mvp2m:
   restore: false
   feat_dim: 2883
   name: coarse_mvp2m
+  restored_model_path: ''
   train_file_path: ${P2MPP_DIR}/datalists/train_list.txt
   test_file_path: ${P2MPP_DIR}/datalists/test_list.txt
-  coarse_result_file_path: ${P2MPP_DIR}/datalists/train_list.txt
-  coarse_result_data_path: ${P2MPP_DIR}/ShapeNetModels/train
   batch_size: 1
   lr: 3e-5
   seed: 123
@@ -36,6 +38,7 @@ p2mpp:
   name: refine_p2mpp
   # about cnn
   load_cnn: yes
+  restored_model_path: ''
   pre_trained_cnn_path: ${P2MPP_DIR}/models/coarse_mvp2m
   cnn_step: 50
   # train

@@ -8,6 +8,7 @@ import pprint
 import pickle
 import os
 
+import modules.experiments as experiments
 from modules.models_p2mpp import MeshNet
 from modules.config import execute
 from utils.dataloader import DataFetcher
@@ -44,23 +45,34 @@ def main(cfg):
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
 
-    root_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name)
-    model_dir = os.path.join(cfg.models_path, cfg.p2mpp.name)
-    log_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'logs')
-    plt_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'plt')
+    data_list_path = os.path.join(cfg.datalists_base_path, cfg.data_list, "train_list.txt")
+
+    root_dir = os.path.join(cfg.train_results_path, experiments.create_experiment_name(prefix=[cfg.p2mpp.name, cfg.data_list]))
+
+    # TODO : It'd be good to add the possibility to generate coarse results here instead of pointing to another, maybe.
+    coarse_mesh_root = os.path.join(cfg.coarse_results_path, cfg.coarse_experiment_name)
+
+    new_model_dir = os.path.join(root_dir, "model")
+    log_dir = os.path.join(root_dir, 'logs')
+    plt_dir = os.path.join(root_dir, 'plt')
+    summaries_dir = os.path.join(root_dir, 'summaries')
+
     if not os.path.exists(root_dir):
         os.mkdir(root_dir)
         print('==> make root dir {}'.format(root_dir))
-    if not os.path.exists(model_dir):
-        os.mkdir(model_dir)
-        print('==> make model dir {}'.format(model_dir))
+    if not os.path.exists(new_model_dir):
+        os.mkdir(new_model_dir)
+        print('==> make model dir {}'.format(new_model_dir))
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
         print('==> make log dir {}'.format(log_dir))
     if not os.path.exists(plt_dir):
         os.mkdir(plt_dir)
         print('==> make plt dir {}'.format(plt_dir))
-    summaries_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'summaries')
+    if not os.path.exists(summaries_dir):
+        os.mkdir(summaries_dir)
+        print('==> make summaries dir {}'.format(summaries_dir))
+
     train_loss = open('{}/train_loss_record.txt'.format(log_dir), 'a')
     train_loss.write('Net {} | Start training | lr =  {}\n'.format(cfg.p2mpp.name, cfg.p2mpp.lr))
     # -------------------------------------------------------------------
@@ -69,8 +81,8 @@ def main(cfg):
     model = MeshNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.p2mpp.train_file_path, data_root=cfg.train_models_path,
-                       image_root=cfg.images_path, is_val=False, mesh_root=cfg.p2mpp.train_mesh_root)
+    data = DataFetcher(file_list=data_list_path, data_root=cfg.train_models_path,
+                       image_root=cfg.images_path, is_val=False, mesh_root=coarse_mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
@@ -83,12 +95,12 @@ def main(cfg):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter(summaries_dir, sess.graph, filename_suffix='train')
     # ---------------------------------------------------------------
-    if cfg.load_cnn:
+    if cfg.p2mpp.load_cnn:
         print('=> load pre-trained cnn')
-        model.loadcnn(sess=sess, ckpt_path=cfg.pre_trained_cnn_path, step=cfg.cnn_step)
+        model.loadcnn(sess=sess, ckpt_path=cfg.p2mpp.pre_trained_cnn_path, step=cfg.p2mpp.cnn_step)
     if cfg.restore:
         print('=> load model')
-        model.load(sess=sess, ckpt_path=model_dir, step=cfg.init_epoch)
+        model.load(sess=sess, ckpt_path=cfg.p2mpp.restored_model_path, step=cfg.p2mpp.init_epoch)
     # ---------------------------------------------------------------
     # Load init ellipsoid and info about vertices and edges
     pkl = pickle.load(open('data/iccv_p2mpp.dat', 'rb'))
@@ -100,8 +112,8 @@ def main(cfg):
     tflearn.is_training(True, sess)
     print('=> start train stage 2')
 
-    for epoch in range(cfg.epochs):
-        current_epoch = epoch + 1 + cfg.init_epoch
+    for epoch in range(cfg.p2mpp.epochs):
+        current_epoch = epoch + 1 + cfg.p2mpp.init_epoch
         epoch_plt_dir = os.path.join(plt_dir, str(current_epoch))
         if not os.path.exists(epoch_plt_dir):
             os.mkdir(epoch_plt_dir)
@@ -127,7 +139,7 @@ def main(cfg):
                 plot_scatter(pt=out2l, data_name=data_id, plt_path=epoch_plt_dir)
         # ---------------------------------------------------------------
         # Save model
-        model.save(sess=sess, ckpt_path=model_dir, step=current_epoch)
+        model.save(sess=sess, ckpt_path=new_model_dir, step=current_epoch)
         train_loss.write('Epoch {}, loss {}\n'.format(current_epoch, mean_loss))
         train_loss.flush()
     # ---------------------------------------------------------------

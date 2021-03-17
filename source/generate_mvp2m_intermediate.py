@@ -84,6 +84,7 @@ def main(cfg):
     test_number = data.number
     tflearn.is_training(False, sess)
     print('=> start test stage 1')
+    print("Beginning generation")
     for iters in range(test_number):
         # Fetch training data
         # need [img, label, pose(camera meta data), dataID]
@@ -104,9 +105,8 @@ def main(cfg):
         out3_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict.xyz'))
         np.savetxt(out3_path, out3)
 
-        experiments.copy_configurations_to_dir(cfg, predict_dir)
-        print('Iteration {}/{}, Data id {}'.format(iters + 1, test_number, data_id))
- 
+        
+    experiments.copy_configurations_to_dir(cfg, predict_dir)
     # ---------------------------------------------------------------
     data.shutdown()
 
