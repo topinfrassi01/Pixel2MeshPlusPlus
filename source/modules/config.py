@@ -53,50 +53,13 @@ def execute():
 def create_parser():
     parser = argparse.ArgumentParser()
 
-    # g = parser.add_argument_group('Device Targets')
     parser.add_argument('-f', '--config_file', dest='config_file', type=argparse.FileType(mode='r'))
+    parser.add_argument('-n', '--expname', help="Experiment's name")
 
-    parser.add_argument('--images_path', help='images path')
-    
-    parser.add_argument('--train_models_path', help='train models path')
-    parser.add_argument('--test_models_path', help='test data path')
-
-    parser.add_argument('--coarse_results_path', help='coarse models path')
-
-    parser.add_argument('--datalists_base_path')
-    parser.add_argument('--coarse_result_file_path', help='coarse result file path')
-
-    parser.add_argument('--test_file_path', help='test file path')
-    parser.add_argument('--train_file_path', help='train file path')
-
-    parser.add_argument('--train_mesh_root', help='init mesh root path')
-    parser.add_argument('--test_mesh_root', help='init mesh root path')
-    parser.add_argument('--batch_size', type=int, default=1, help='batch size')
-    parser.add_argument('--lr', type=float, default=3e-5, help='learning rate')
-    parser.add_argument('--seed', type=int, default=123, help='random seed')
-    parser.add_argument('--init_epoch', type=int, default=0, help='init epoch')
-    parser.add_argument('--test_epoch', type=int, default=0, help='test epoch')
-    parser.add_argument('--hidden_dim', type=int, default=192, help='hidden dim')
-    parser.add_argument('--feat_dim', type=int, default=2883, help='feat dim')
-    parser.add_argument('--stage2_feat_dim', type=int, default=339, help='stage2 feat dim')
-
-    parser.add_argument('--predictions_path', help="Predictions path")
-    parser.add_argument('--coord_dim', type=int, default=3, help='coord dim')
-    parser.add_argument('-e', '--epochs', type=int, default=20, help='number of epochs')
-    parser.add_argument('-g', '--gpu_id', help='devices ids')
-    parser.add_argument('-m', '--models_path', help='models path')
-    parser.add_argument('-s', '--save_path', help='save root')
-    parser.add_argument('-n', '--name', help='exprtiments name')
-    parser.add_argument('--restore', type=str2bool, default=False)
-    parser.add_argument('--is_debug', type=str2bool, default='no', help='is debug')
-    parser.add_argument('--is_voxel_input', type=str2bool, default='no', help='is debug')
-    # pretrained cnn
-    parser.add_argument('--load_cnn', type=str2bool, default=False)
-    parser.add_argument('--pre_trained_cnn_path', help='pre-trained cnn path')
-    parser.add_argument('--cnn_step', type=int, help='cnn pre-trained step')
     return parser
 
 env_matcher = re.compile(r'\$\{([^}^{]+)\}')
+#pylint: disable=unused-argument
 def env_constructor(loader, node):
     ''' Extract the matched value, expand env variable, and replace the match '''
     value = node.value
@@ -125,14 +88,9 @@ def parse_args(parser):
         loader.add_implicit_resolver('!env', env_matcher, None)
         loader.add_constructor('!env', env_constructor)
 
-        #TODO : Come back here to fix this mess.
         data = AttrDict(yaml.load(args.config_file, Loader=loader))
 
-        delattr(args, 'config_file')
-        arg_dict = args.__dict__
-        for key, value in arg_dict.items():
-            default_arg = parser.get_default(key)
-            if arg_dict[key] == default_arg and key in data:
-                arg_dict[key] = data[key]
+        if args["expname"] is not None:
+            data["expname"] = args["expname"]
 
     return data

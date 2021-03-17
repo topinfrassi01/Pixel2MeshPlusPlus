@@ -1,9 +1,13 @@
 {
-    "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.lintOnSave": true,
+    "python.linting.ignorePatterns": [
+        "**/external/"
+    ],
     "python.linting.pylintArgs": [
-        "--disable=C",
+        "--disable=C,protected-access",
+        "--ignored-modules=tensorflow", //seems like pylint and tensorflow aren't a good match. In newer tf/pylint versions it may be fixed.
         "--extension-pkg-whitelist=cv2",
-        "--ignore-patterns=**/external/"
     ]
 }

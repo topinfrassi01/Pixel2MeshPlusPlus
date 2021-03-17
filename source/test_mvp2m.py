@@ -89,7 +89,7 @@ def main(cfg):
         feed_dict.update({placeholders['labels']: labels})
         feed_dict.update({placeholders['cameras']: poses})
         # ---------------------------------------------------------------
-        _1, _2out2, out3 = sess.run([model.output1, model.output2, model.output3], feed_dict=feed_dict)
+        _out1, _out2, out3 = sess.run([model.output1, model.output2, model.output3], feed_dict=feed_dict)
         # ---------------------------------------------------------------
         # save GT
         label_path = os.path.join(predict_dir, data_id.replace('.dat', '_ground.xyz'))

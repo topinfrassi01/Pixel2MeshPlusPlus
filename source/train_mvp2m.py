@@ -114,7 +114,7 @@ def main(cfg):
             feed_dict.update({placeholders['labels']: labels})
             feed_dict.update({placeholders['cameras']: poses})
             # ---------------------------------------------------------------
-            _1, dists, summaries, _2, out3, out3 = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1, model.output2, model.output3], feed_dict=feed_dict)
+            _1, dists, summaries, _out1, _out2, out3 = sess.run([model.opt_op, model.loss, model.merged_summary_op, model.output1, model.output2, model.output3], feed_dict=feed_dict)
             # ---------------------------------------------------------------
             all_loss[iters] = dists
             mean_loss = np.mean(all_loss[np.where(all_loss)])

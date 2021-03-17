@@ -6,7 +6,6 @@ deprecation._PRINT_DEPRECATION_WARNINGS = False
 import tensorflow as tf
 import tflearn
 import numpy as np
-import pprint
 import pickle
 import os
 from natsort import natsorted
@@ -16,19 +15,20 @@ from modules.models_mvp2m import MeshNetMVP2M
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
+from datetime import datetime
 
-def get_most_recent_run(directory):
+def get_most_recent_experiment(directory):
     folders = list(filter(os.path.isdir, [Path(directory) / x for x in os.listdir(directory)]))
 
     if len(folders) == 0:
         raise Exception("Folder {0} is empty.".format(directory))
 
     return natsorted(folders, reverse=True)[0]
+ 
+def create_experiment_name(suffix=None):    
+    datestring = datetime.now().strftime("%m%d%Y-%H%M%S")
 
-def create_run_name(prefix=None, suffix=None):
-    from datetime import datetime
-
-    return datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+    return datestring if suffix is None else "_".join([datestring, suffix])
 
 def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
@@ -64,10 +64,10 @@ def main(cfg):
     model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
     print(model_dir)
 
-    data_list_path = os.path.join(cfg.datalists_base_path, get_most_recent_run(cfg.datalists_base_path), "train_list.txt")
+    data_list_path = os.path.join(cfg.datalists_base_path, get_most_recent_experiment(cfg.datalists_base_path), "train_list.txt")
     print(data_list_path)
 
-    predict_dir = os.path.join(cfg.coarse_results_path, create_run_name())
+    predict_dir = os.path.join(cfg.coarse_results_path, create_experiment_name())
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
@@ -76,7 +76,7 @@ def main(cfg):
     # Define model
     
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
-    
+      
     # ---------------------------------------------------------------
     print('=> load data')
     data = DataFetcher(file_list=data_list_path,
@@ -127,7 +127,7 @@ def main(cfg):
         np.savetxt(out3_path, out3)
 
         print('Iteration {}/{}, Data id {}'.format(iters + 1, test_number, data_id))
-
+ 
     # ---------------------------------------------------------------
     data.shutdown()
     print('CNN-GCN Optimization Finished!')
