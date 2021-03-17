@@ -39,8 +39,8 @@ p2mpp:
   # about cnn
   load_cnn: yes
   restored_model_path: ''
-  pre_trained_cnn_path: ${P2MPP_DIR}/models/coarse_mvp2m
-  cnn_step: 50
+  pre_trained_cnn_path: ${P2MPP_DIR}/models/refine_p2mpp
+  cnn_step: 10
   # train
   lr: 1e-5
   epochs: 10

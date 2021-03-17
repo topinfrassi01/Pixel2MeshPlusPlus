@@ -98,7 +98,7 @@ def main(cfg):
     if cfg.p2mpp.load_cnn:
         print('=> load pre-trained cnn')
         model.loadcnn(sess=sess, ckpt_path=cfg.p2mpp.pre_trained_cnn_path, step=cfg.p2mpp.cnn_step)
-    if cfg.restore:
+    if cfg.p2mpp.restore:
         print('=> load model')
         model.load(sess=sess, ckpt_path=cfg.p2mpp.restored_model_path, step=cfg.p2mpp.init_epoch)
     # ---------------------------------------------------------------
