@@ -1,4 +1,5 @@
 gpu_id: 0
+seed: 123
 train_models_path: ${P2MPP_DIR}/data/ShapeNet/Models/train
 test_models_path: ${P2MPP_DIR}/data/ShapeNet/Models/test
 images_path: ${P2MPP_DIR}/data/ShapeNet/Images
@@ -7,7 +8,7 @@ models_path: ${P2MPP_DIR}/models
 datalists_base_path: ${P2MPP_DIR}/datalists
 misc_results_path: ${P2MPP_DIR}/results_misc
 coarse_results_path: ${P2MPP_DIR}/results_coarse
-experiment_name: ''
+data_list: ''
 
 mvp2m: 
   lr: 1e-5

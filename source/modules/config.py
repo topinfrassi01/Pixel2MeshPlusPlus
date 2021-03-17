@@ -6,6 +6,8 @@ import yaml
 import re
 import os
 
+from modules.experiments import get_most_recent_datalist
+
 class AttrDict(dict):
     """ Nested Attribute Dictionary
 
@@ -54,7 +56,7 @@ def create_parser():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-f', '--config_file', dest='config_file', type=argparse.FileType(mode='r'))
-    parser.add_argument('-n', '--expname', help="Experiment's name")
+    parser.add_argument('-d', '--data_list', help="List to use in the run")
 
     return parser
 
@@ -90,7 +92,14 @@ def parse_args(parser):
 
         data = AttrDict(yaml.load(args.config_file, Loader=loader))
 
-        if args["expname"] is not None:
-            data["expname"] = args["expname"]
+        if args.data_list is not None:
+            data["data_list"] = args.data_list
+
+        if data.data_list is None or data.data_list == '':
+            print("No data list (--data_list or into config file) provided, using the last one after natural sort.")
+
+            data["data_list"] = get_most_recent_datalist(data.datalists_base_path)
+
+        data["config"] = args.config_file.name
 
     return data

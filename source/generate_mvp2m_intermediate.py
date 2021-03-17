@@ -8,36 +8,19 @@ import tflearn
 import numpy as np
 import pickle
 import os
-from natsort import natsorted
-from pathlib import Path
+
 
 from modules.models_mvp2m import MeshNetMVP2M
 from modules.config import execute
 from utils.dataloader import DataFetcher
 from utils.tools import construct_feed_dict
-from datetime import datetime
-
-def get_most_recent_experiment(directory):
-    folders = list(filter(os.path.isdir, [Path(directory) / x for x in os.listdir(directory)]))
-
-    if len(folders) == 0:
-        raise Exception("Folder {0} is empty.".format(directory))
-
-    return natsorted(folders, reverse=True)[0]
- 
-def create_experiment_name(suffix=None):    
-    datestring = datetime.now().strftime("%m%d%Y-%H%M%S")
-
-    return datestring if suffix is None else "_".join([datestring, suffix])
+import modules.experiments as experiments
 
 def main(cfg):
     os.environ['CUDA_VISIBLE_DEVICES'] = str(cfg.gpu_id)
-    # ---------------------------------------------------------------
-    # Set random seed
-    print('=> pre-porcessing')
-    seed = 123
-    np.random.seed(seed)
-    tf.set_random_seed(seed)
+    
+    np.random.seed(cfg.seed)
+    tf.set_random_seed(cfg.seed)
     # ---------------------------------------------------------------
     num_blocks = 3
     num_supports = 2
@@ -59,15 +42,13 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
-    print(cfg)
     step = cfg.mvp2m.test_epoch
     model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
     print(model_dir)
 
-    data_list_path = os.path.join(cfg.datalists_base_path, get_most_recent_experiment(cfg.datalists_base_path), "train_list.txt")
-    print(data_list_path)
+    data_list_path = os.path.join(cfg.datalists_base_path, cfg.data_list, "train_list.txt")
+    predict_dir = os.path.join(cfg.coarse_results_path, experiments.create_experiment_name(prefix=cfg.data_list))
 
-    predict_dir = os.path.join(cfg.coarse_results_path, create_experiment_name())
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
@@ -113,9 +94,6 @@ def main(cfg):
         # ---------------------------------------------------------------
         _1, _2, out3 = sess.run([model.output1, model.output2, model.output3], feed_dict=feed_dict)
         # ---------------------------------------------------------------
-        # save GT
-        label_path = os.path.join(predict_dir, data_id.replace('.dat', '_ground.xyz'))
-        np.savetxt(label_path, labels)
         # save 1
         # out1_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict_1.xyz'))
         # np.savetxt(out1_path, out1)
@@ -126,10 +104,12 @@ def main(cfg):
         out3_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict.xyz'))
         np.savetxt(out3_path, out3)
 
+        experiments.copy_configurations_to_dir(cfg, predict_dir)
         print('Iteration {}/{}, Data id {}'.format(iters + 1, test_number, data_id))
  
     # ---------------------------------------------------------------
     data.shutdown()
+
     print('CNN-GCN Optimization Finished!')
 
 

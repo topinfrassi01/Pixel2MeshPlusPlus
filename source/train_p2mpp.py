@@ -20,9 +20,8 @@ def main(cfg):
     # ---------------------------------------------------------------
     # Set random seed
     print('=> pre-processing')
-    seed = 123
-    np.random.seed(seed)
-    tf.set_random_seed(seed)
+    np.random.seed(cfg.seed)
+    tf.set_random_seed(cfg.seed)
     # ---------------------------------------------------------------
     num_blocks = 3
     num_supports = 2
