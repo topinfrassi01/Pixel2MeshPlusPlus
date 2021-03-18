@@ -79,17 +79,20 @@ def sample(pred, placeholders, block_id):
 
 def choice_faces(verts, faces):
     num = 4000
-    u1, u2, u3 = np.split(verts[faces[:, 0]] - verts[faces[:, 1]], 3, axis=1)
-    v1, v2, v3 = np.split(verts[faces[:, 1]] - verts[faces[:, 2]], 3, axis=1)
+
+    u1, u2, u3 = tf.split(tf.gather(verts, faces[:,0], axis=0) - tf.gather(verts, faces[:,1], axis=0), 3, axis=1)
+    v1, v2, v3 = tf.split(tf.gather(verts, faces[:,1], axis=0) - tf.gather(verts, faces[:,2], axis=0), 3, axis=1)
+
     a = (u2 * v3 - u3 * v2) ** 2
     b = (u3 * v1 - u1 * v3) ** 2
     c = (u1 * v2 - u2 * v1) ** 2
     Areas = np.sqrt(a + b + c) / 2
     Areas = Areas / np.sum(Areas)
     choices = np.expand_dims(np.arange(Areas.shape[0]), 1)
+    
     dist = stats.rv_discrete(name='custm', values=(choices, Areas))
     choices = dist.rvs(size=num)
-    select_faces = faces[choices]
+    select_faces = tf.gather(faces, choices)
     return select_faces
 
 
