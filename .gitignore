@@ -8,3 +8,5 @@ data/*
 models/*
 archives/*
 !**/.gitkeep
+#/lib is used for remote execution, not related to the project
+/lib
