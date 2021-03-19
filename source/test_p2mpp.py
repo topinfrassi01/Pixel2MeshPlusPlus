@@ -8,6 +8,7 @@ import pprint
 import pickle
 import os
 
+import modules.experiments as experiments
 from modules.models_p2mpp import MeshNet
 from modules.config import execute
 from utils.dataloader import DataFetcher
@@ -44,8 +45,12 @@ def main(cfg):
     }
 
     step = cfg.p2mpp.test_epoch
+    data_list_path = os.path.join(cfg.datalists_base_path, cfg.data_list, "test_list.txt")
+
     model_dir = os.path.join(cfg.models_path, cfg.p2mpp.name)
-    predict_dir = os.path.join(cfg.p2mpp.save_path, cfg.p2mpp.name, 'predict', str(step))
+    predict_dir = os.path.join(cfg.test_results_path, experiments.create_experiment_name(prefix=[cfg.p2mpp.name, cfg.data_list]))
+    mesh_root = os.path.join(cfg.coarse_results_path, cfg.coarse_experiment_name)
+    
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
         print('==> make predict_dir {}'.format(predict_dir))
@@ -55,8 +60,8 @@ def main(cfg):
     model = MeshNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.p2mpp.test_file_path, data_root=cfg.test_models_path,
-                       image_root=cfg.images_path, is_val=True, mesh_root=cfg.p2mpp.test_mesh_root)
+    data = DataFetcher(file_list=data_list_path, data_root=cfg.test_models_path,
+                       image_root=cfg.images_path, is_val=True, mesh_root=mesh_root)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
@@ -80,7 +85,7 @@ def main(cfg):
     print('=> start test stage 2')
     for iters in range(test_number):
         # Fetch training data
-        # need [img, label, pose(camera meta data), dataID]
+        # need [img, label, pose(camera meta data), dataID, mesh]
         img_all_view, labels, poses, data_id, mesh = data.fetch()
         feed_dict.update({placeholders['img_inp']: img_all_view})
         feed_dict.update({placeholders['features']: mesh})
@@ -89,22 +94,13 @@ def main(cfg):
         # ---------------------------------------------------------------
         _, out2l = sess.run([model.output1l, model.output2l], feed_dict=feed_dict)
         # ---------------------------------------------------------------
-        # save GT
-        label_path = os.path.join(predict_dir, data_id.replace('.dat', '_ground.xyz'))
-        np.savetxt(label_path, labels)
-        # save 1
-        # out1_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict_1.xyz'))
-        # np.savetxt(out1_path, out1)
-        # # save 2
-        # out2_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict_2.xyz'))
-        # np.savetxt(out2_path, out2)
-        # save 3
-        out3_path = os.path.join(predict_dir, data_id.replace('.dat', '_predict.xyz'))
+        out3_path = os.path.join(predict_dir, data_id.replace('.dat', '.xyz'))
         np.savetxt(out3_path, out2l)
 
         print('Iteration {}/{}, Data id {}'.format(iters + 1, test_number, data_id))
 
     # ---------------------------------------------------------------
+    experiments.copy_configurations_to_dir(cfg, predict_dir)
     data.shutdown()
     print('CNN-GCN Optimization Finished!')
 
@@ -112,5 +108,4 @@ def main(cfg):
 if __name__ == '__main__':
     print('=> set config')
     args = execute()
-    pprint.pprint(vars(args))
     main(args)
