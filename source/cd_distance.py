@@ -4,16 +4,17 @@
 import os
 import numpy as np
 import tensorflow as tf
-import pprint
 import glob
+import pickle
+
 from modules.chamfer import nn_distance
 from modules.config import execute
 
 if __name__ == '__main__':
     print('=> set config')
     args = execute()
-    pprint.pprint(vars(args))
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
+
     xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
     xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
     dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
@@ -23,14 +24,16 @@ if __name__ == '__main__':
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     sess = tf.Session(config=config)
-
-    pred_file_list = os.path.join(args.save_path, args.name, 'predict', str(args.test_epoch), '*_predict.xyz')
+    
+    pred_file_list = os.path.join(args.test_results_path, args.p2mpp_experiment_name, '*.xyz')
     xyz_list_path = glob.glob(pred_file_list)
 
-    log_dir = os.path.join(args.save_path, args.name, 'logs')
+    log_dir = os.path.join(args.misc_results_path, args.p2mpp_experiment_name)
+    
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    log_path = os.path.join(log_dir, '{}_cd.log'.format(args.test_epoch))
+
+    log_path = os.path.join(log_dir, 'cd.log')
 
     name = {'02828884': 'bench', '03001627': 'chair', '03636649': 'lamp', '03691459': 'speaker', '04090263': 'firearm',
             '04379243': 'table', '04530566': 'watercraft', '02691156': 'plane', '02933112': 'cabinet',
@@ -43,8 +46,10 @@ if __name__ == '__main__':
     index = 0
     total_num = len(xyz_list_path)
     for pred_path in xyz_list_path:
-        lab_path = pred_path.replace('_predict', '_ground')
-        ground = np.loadtxt(lab_path)[:, :3]
+        filename = os.path.basename(pred_path)
+        #Ground_thruth contains an image of the reconstructed object in [0] and the point cloud and normals on [1]
+        ground_truth_path = os.path.join(args.test_models_path, filename.replace(".xyz", ".dat"))
+        ground = pickle.load(open(ground_truth_path, 'rb'), encoding='bytes')[1][:, :3]
         predict = np.loadtxt(pred_path)
 
         class_id = pred_path.split('/')[-1].split('_')[0]
@@ -62,6 +67,6 @@ if __name__ == '__main__':
     for item in length:
         number = length[item] + 1e-6
         score = (sum_pred[item] / number) * 10000
-        print(item, name[item], int(length[item]), score)
-        print(item, name[item], int(length[item]), score, file=log)
+        log.write(", ".join([item, name[item], str(length[item]), str(score),"\n"]))
+
     sess.close()
