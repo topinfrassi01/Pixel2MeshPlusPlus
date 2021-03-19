@@ -21,15 +21,15 @@ def get_most_recent_datalist(directory):
 def create_experiment_name(prefix=None, suffix=None):    
     experiment_name = ""
 
-    if prefix is not None:
+    if prefix:
         if isinstance(prefix, list):
             prefix = "_".join(prefix)
-        else:
-            experiment_name += prefix + "_"
+        
+        experiment_name += prefix + "_"
 
     experiment_name += datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
-    if suffix is not None:
+    if suffix:
         if isinstance(suffix, list):
             suffix = "_".join(suffix)
 
