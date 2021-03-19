@@ -32,5 +32,5 @@ def plot_scatter(pt, data_name, plt_path):
     ax.set_ylim(mid_y - max_range, mid_y + max_range)
     ax.set_zlim(mid_z - max_range, mid_z + max_range)
 
-    plt.margins(0, 0)
+    plt.margins(0, 0, 0)
     fig.savefig(os.path.join(plt_path, data_name.replace('.dat', '.png')), format='png', transparent=True, dpi=300, pad_inches=0, bbox_inches='tight')
