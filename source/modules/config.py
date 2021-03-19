@@ -55,7 +55,7 @@ def create_parser():
 
     parser.add_argument('-f', '--config_file', dest='config_file', type=argparse.FileType(mode='r'))
     parser.add_argument('-d', '--data_list', help="List to use in the run")
-
+    parser.add_argument('--test', action="store_true", help="Define if the coarse shape generation should be ran on the train or test set")
     return parser
 
 env_matcher = re.compile(r'\$\{([^}^{]+)\}')
@@ -89,6 +89,8 @@ def parse_args(parser):
         loader.add_constructor('!env', env_constructor)
 
         data = AttrDict(yaml.load(args.config_file, Loader=loader))
+
+        data["train"] = not args.test
 
         if args.data_list is not None:
             data["data_list"] = args.data_list

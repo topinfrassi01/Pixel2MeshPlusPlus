@@ -42,12 +42,14 @@ def main(cfg):
         'faces_triangle': [tf.placeholder(tf.int32, shape=(None, 3)) for _ in range(num_blocks)],
         'sample_adj': [tf.placeholder(tf.float32, shape=(43, 43)) for _ in range(num_supports)],
     }
+
+    train_or_test = "train" if cfg.train else "test"
+
     step = cfg.mvp2m.test_epoch
     model_dir = os.path.join(cfg.models_path, cfg.mvp2m.name)
-    print(model_dir)
 
-    data_list_path = os.path.join(cfg.datalists_base_path, cfg.data_list, "train_list.txt")
-    predict_dir = os.path.join(cfg.coarse_results_path, experiments.create_experiment_name(prefix=cfg.data_list))
+    data_list_path = os.path.join(cfg.datalists_base_path, cfg.data_list, "{0}_list.txt".format(train_or_test))
+    predict_dir = os.path.join(cfg.coarse_results_path, experiments.create_experiment_name(prefix=[cfg.data_list, train_or_test]))
 
     if not os.path.exists(predict_dir):
         os.makedirs(predict_dir)
@@ -57,12 +59,12 @@ def main(cfg):
     # Define model
     
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
-      
+
     # ---------------------------------------------------------------
     print('=> load data')
     data = DataFetcher(file_list=data_list_path,
-                       data_root=cfg.train_models_path,
-                       image_root=cfg.images_path, is_val=False)
+                       data_root=cfg.train_models_path if cfg.train else cfg.test_models_path,
+                       image_root=cfg.images_path, is_val=not cfg.train)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
@@ -89,6 +91,7 @@ def main(cfg):
         # Fetch training data
         # need [img, label, pose(camera meta data), dataID]
         img_all_view, labels, poses, data_id, _ = data.fetch()
+
         feed_dict.update({placeholders['img_inp']: img_all_view})
         feed_dict.update({placeholders['labels']: labels})
         feed_dict.update({placeholders['cameras']: poses})
