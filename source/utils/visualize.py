@@ -12,7 +12,7 @@ def plot_scatter(pt, data_name, plt_path):
     fig = plt.figure()
     fig.set_size_inches(20.0 / 3, 20.0 / 3)
     ax = fig.gca(projection='3d')
-    ax.set_aspect('equal')
+    ax.set_aspect('auto')
     ax.grid(color='r', linestyle='-',)
     ax.set_yticklabels([])
     ax.set_xticklabels([])
