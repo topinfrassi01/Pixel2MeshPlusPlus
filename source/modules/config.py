@@ -6,8 +6,6 @@ import yaml
 import re
 import os
 
-from modules.experiments import get_most_recent_datalist
-
 class AttrDict(dict):
     """ Nested Attribute Dictionary
 
@@ -94,11 +92,6 @@ def parse_args(parser):
 
         if args.data_list is not None:
             data["data_list"] = args.data_list
-
-        if data.data_list is None or data.data_list == '':
-            print("No data list (--data_list or into config file) provided, using the last one after natural sort.")
-
-            data["data_list"] = get_most_recent_datalist(data.datalists_base_path)
 
         data["config"] = args.config_file.name
 

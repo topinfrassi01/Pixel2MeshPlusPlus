@@ -8,16 +8,6 @@ from natsort import natsorted
 import yaml
 
 
-def get_most_recent_datalist(directory):
-    folders = list(filter(os.path.isdir, [Path(directory) / x for x in os.listdir(directory)]))
-
-    if len(folders) == 0:
-        raise Exception("Folder {0} is empty.".format(directory))
-
-    most_recent_exp = str(natsorted(folders, reverse=True)[0])
-    return os.path.basename(most_recent_exp)
- 
-
 def create_experiment_name(prefix=None, suffix=None):    
     experiment_name = ""
 
