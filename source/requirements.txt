@@ -5,4 +5,3 @@ opencv-python
 pyyaml
 scipy
 matplotlib
-natsort

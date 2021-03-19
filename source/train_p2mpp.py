@@ -49,7 +49,6 @@ def main(cfg):
 
     root_dir = os.path.join(cfg.train_results_path, experiments.create_experiment_name(prefix=[cfg.p2mpp.name, cfg.data_list]))
 
-    # TODO : It'd be good to add the possibility to generate coarse results here instead of pointing to another, maybe.
     coarse_mesh_root = os.path.join(cfg.coarse_results_path, cfg.coarse_experiment_name)
 
     new_model_dir = os.path.join(root_dir, "model")
@@ -95,6 +94,7 @@ def main(cfg):
     sess.run(tf.global_variables_initializer())
     train_writer = tf.summary.FileWriter(summaries_dir, sess.graph, filename_suffix='train')
     # ---------------------------------------------------------------
+
     if cfg.p2mpp.load_cnn:
         print('=> load pre-trained cnn')
         model.loadcnn(sess=sess, ckpt_path=cfg.p2mpp.pre_trained_cnn_path, step=cfg.p2mpp.cnn_step)

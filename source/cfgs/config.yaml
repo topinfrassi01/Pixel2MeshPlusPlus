@@ -8,10 +8,11 @@ models_path: ${P2MPP_DIR}/models
 datalists_base_path: ${P2MPP_DIR}/datalists
 misc_results_path: ${P2MPP_DIR}/results_misc
 train_results_path: ${P2MPP_DIR}/results_train
+test_results_path: ${P2MPP_DIR}/results_test
 coarse_results_path: ${P2MPP_DIR}/results_coarse
 
 data_list: 'only_sofas'
-coarse_experiment_name: 'only_sofas_20210317-163507'
+coarse_experiment_name: 'only_sofas_test_20210319-181933'
 
 mvp2m: 
   lr: 1e-5
@@ -44,18 +45,12 @@ p2mpp:
   # train
   lr: 1e-5
   epochs: 10
-  init_epoch: 50
+  init_epoch: 0
   batch_size: 1
-  lr: 3e-5
   seed: 123
-  test_epoch: 0
   hidden_dim: 192
   stage2_feat_dim: 339
   coord_dim: 3
   restore: false
-  train_file_path: ${P2MPP_DIR}/datalists/train_list.txt
-  train_mesh_root: ${P2MPP_DIR}/results/coarse_mvp2m/coarse_intermediate/50
   # test
   test_epoch: 10
-  test_file_path: ${P2MPP_DIR}/datalists/test_list.txt
-  test_mesh_root: ${P2MPP_DIR}/coarse_mvp2m/predict/50

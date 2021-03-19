@@ -55,6 +55,7 @@ class DataFetcher(threading.Thread):
             mesh = None
         imgs = np.zeros((3, 224, 224, 3))
         poses = np.zeros((3, 5))
+        #TODO : Change the passed images to something more random and add that information somewhere.
         for idx, view in enumerate([0, 6, 7]):
             img = cv2.imread(os.path.join(img_path, str(view).zfill(2) + '.png'), cv2.IMREAD_UNCHANGED)
             img[np.where(img[:, :, 3] == 0)] = 255
