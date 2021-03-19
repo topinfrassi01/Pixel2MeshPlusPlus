@@ -51,8 +51,8 @@ def main(cfg):
     # -------------------------------------------------------------------
     print('=> build model')
     # Define model
-    model1 = MVP2MNet(placeholders, logging=True, args=cfg)
-    model2 = P2MPPNet(placeholders, logging=True, args=cfg)
+    model1 = MVP2MNet(placeholders, logging=True, args=cfg.mvp2m)
+    model2 = P2MPPNet(placeholders, logging=True, args=cfg.p2mpp)
     # ---------------------------------------------------------------
     print('=> load data')
     demo_img_list = ['data/demo/plane1.png',
