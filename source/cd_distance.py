@@ -33,7 +33,7 @@ if __name__ == '__main__':
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    log_path = os.path.join(log_dir, 'cd.log')
+    log_path = os.path.join(log_dir, 'chamfer_distance.log')
 
     name = {'02828884': 'bench', '03001627': 'chair', '03636649': 'lamp', '03691459': 'speaker', '04090263': 'firearm',
             '04379243': 'table', '04530566': 'watercraft', '02691156': 'plane', '02933112': 'cabinet',
@@ -63,10 +63,10 @@ if __name__ == '__main__':
         print('processed number', index, total_num)
 
     print(log_path)
-    log = open(log_path, 'a')
-    for item in length:
-        number = length[item] + 1e-6
-        score = (sum_pred[item] / number) * 10000
-        log.write(", ".join([item, name[item], str(length[item]), str(score),"\n"]))
+    with open(log_path, 'a+') as log:
+        for item in length:
+            number = length[item] + 1e-6
+            score = (sum_pred[item] / number) * 10000
+            log.write(", ".join([item, name[item], str(length[item]), str(score),"\n"]))
 
     sess.close()

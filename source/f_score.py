@@ -2,39 +2,34 @@
 # All rights reserved.
 # This code is licensed under BSD 3-Clause License.
 import os
-import sys
 import numpy as np
 import pickle as pickle
 import tensorflow as tf
-import pprint
 import glob
-import os
 from modules.chamfer import nn_distance
 from modules.config import execute
 
-
+#pylint: disable=unused-argument
 def f_score(points, labels, dist1, idx1, dist2, idx2, threshold):
     len_points = points.shape[0]
     len_labels = labels.shape[0]
-
-    f_score = []
+    f_scores = []
     for i in range(len(threshold)):
         num = len(np.where(dist1 <= threshold[i])[0]) + 0.0
         P = 100.0 * (num / len_points)
         num = len(np.where(dist2 <= threshold[i])[0]) + 0.0
         R = 100.0 * (num / len_labels)
-        f_score.append((2 * P * R) / (P + R + 1e-6))
-    return np.array(f_score)
+        f_scores.append((2 * P * R) / (P + R + 1e-6))
+
+    return np.array(f_scores)
 
 
-if __name__ == '__main__':
-    print('=> set config')
+def main():
     args = execute()
-    pprint.pprint(vars(args))
-    pred_file_list = os.path.join(args.save_path, args.name, 'predict', str(args.test_epoch), '*_predict.xyz')
-    xyz_list_path = glob.glob(pred_file_list)
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
-    # exit(0)
+    pred_file_list = os.path.join(args.test_results_path, args.p2mpp_experiment_name, '*.xyz')
+    xyz_list_path = glob.glob(pred_file_list)
+    
     xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
     xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
     dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
@@ -43,7 +38,7 @@ if __name__ == '__main__':
     config.allow_soft_placement = True
     sess = tf.Session(config=config)
 
-    # xyz_list_path = sys.argv[1]
+    #A f1-score will be calculated for each threshold.
     threshold = [0.00005, 0.00010, 0.00015, 0.00020]
     name = {'02828884': 'bench', '03001627': 'chair', '03636649': 'lamp', '03691459': 'speaker', '04090263': 'firearm',
             '04379243': 'table', '04530566': 'watercraft', '02691156': 'plane', '02933112': 'cabinet',
@@ -56,10 +51,11 @@ if __name__ == '__main__':
                 '04401088': np.zeros(4)}
 
     index = 0
-    total_num = len(xyz_list_path)
     for pred_path in xyz_list_path:
-        lab_path = pred_path.replace('_predict', '_ground')
-        ground = np.loadtxt(lab_path)[:, :3]
+        filename = os.path.basename(pred_path)
+        #Ground_thruth contains an image of the reconstructed object in [0] and the point cloud and normals on [1]
+        ground_truth_path = os.path.join(args.test_models_path, filename.replace(".xyz", ".dat"))
+        ground = pickle.load(open(ground_truth_path, 'rb'), encoding='bytes')[1][:, :3]
         predict = np.loadtxt(pred_path)
 
         class_id = pred_path.split('/')[-1].split('_')[0]
@@ -68,22 +64,21 @@ if __name__ == '__main__':
         sum_pred[class_id] += f_score(predict, ground, d1, i1, d2, i2, threshold)
 
         index += 1
-        print('processed number', index, total_num)
 
-    print(sum_pred)
-    log_dir = os.path.join(args.save_path, args.name, 'logs')
+    log_dir = os.path.join(args.misc_results_path, args.p2mpp_experiment_name)
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    log_path = os.path.join(log_dir, '{}_f_score.log'.format(args.test_epoch))
-    print(log_path)
-    logfile = open(log_path, 'a')
-    means = []
-    for item in length:
-        number = length[item] + 1e-6
-        score = sum_pred[item] / number
-        means.append(score)
-        print(item, name[item], length[item], ' '.join(map(str, score)))
-        print(item, name[item], length[item], ' '.join(map(str, score)), file=logfile)
-    print('-' * 80)
-    print('mean', 'all_data', 'total_number', np.mean(means, axis=0))
+
+    log_path = os.path.join(log_dir, 'f1_score.log')
+    
+    with open(log_path, 'a+') as log:
+        for item in length:
+            number = length[item] + 1e-6
+            score = sum_pred[item] / number
+            log.write(", ".join([item, name[item], str(length[item]), str(score),"\n"]))
+
     sess.close()
+
+
+if __name__ == '__main__':
+    main()
