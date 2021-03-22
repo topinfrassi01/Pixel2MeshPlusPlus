@@ -1,12 +1,5 @@
 **__pycache__**
-results_train/*
-results_misc/*
-results_test/*
-results_coarse/*
-datalists/*
-data/*
 models/*
-archives/*
 !**/.gitkeep
 #/lib is used for remote execution, not related to the project
 /lib
