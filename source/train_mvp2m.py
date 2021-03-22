@@ -80,7 +80,7 @@ def main(cfg):
     model = MeshNetMVP2M(placeholders, logging=True, args=cfg.mvp2m)
     # ---------------------------------------------------------------
     print('=> load data')
-    data = DataFetcher(file_list=cfg.data_list_path, data_root=cfg.train_models_path, image_root=cfg.images_path, is_val=False)
+    data = DataFetcher(file_list=data_list_path, data_root=cfg.train_models_path, image_root=cfg.images_path, is_val=False)
     data.setDaemon(True)
     data.start()
     # ---------------------------------------------------------------
