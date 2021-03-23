@@ -6,23 +6,8 @@ import numpy as np
 import pickle as pickle
 import tensorflow as tf
 import glob
-from modules.chamfer import nn_distance
+from modules.metrics import dice
 from modules.config import execute
-
-#pylint: disable=unused-argument
-def f_score(points, labels, dist1, idx1, dist2, idx2, threshold):
-    len_points = points.shape[0]
-    len_labels = labels.shape[0]
-    f_scores = []
-    for i in range(len(threshold)):
-        num = len(np.where(dist1 <= threshold[i])[0]) + 0.0
-        P = 100.0 * (num / len_points)
-        num = len(np.where(dist2 <= threshold[i])[0]) + 0.0
-        R = 100.0 * (num / len_labels)
-        f_scores.append((2 * P * R) / (P + R + 1e-6))
-
-    return np.array(f_scores)
-
 
 def main():
     args = execute()
@@ -30,9 +15,6 @@ def main():
     pred_file_list = os.path.join(args.test_results_path, args.p2mpp_experiment_name, '*.xyz')
     xyz_list_path = glob.glob(pred_file_list)
     
-    xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
-    xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
-    dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
@@ -60,8 +42,7 @@ def main():
 
         class_id = pred_path.split('/')[-1].split('_')[0]
         length[class_id] += 1.0
-        d1, i1, d2, i2 = sess.run([dist1, idx1, dist2, idx2], feed_dict={xyz1: predict, xyz2: ground})
-        sum_pred[class_id] += f_score(predict, ground, d1, i1, d2, i2, threshold)
+        sum_pred[class_id] += dice(predict, ground, threshold, sess)
 
         index += 1
 

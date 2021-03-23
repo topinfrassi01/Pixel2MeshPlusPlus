@@ -5,3 +5,9 @@ opencv-python
 pyyaml
 scipy
 matplotlib
+#Dependencies for goICP
+Cython
+autowrap
+py-goicp
+scikit-learn
+trimesh

@@ -7,24 +7,21 @@ import tensorflow as tf
 import glob
 import pickle
 
-from modules.chamfer import nn_distance
+from modules.metrics import chamfer_distance
 from modules.config import execute
+
 
 if __name__ == '__main__':
     print('=> set config')
     args = execute()
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
-
-    xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
-    xyz2 = tf.placeholder(tf.float32, shape=(None, 3))
-    dist1, idx1, dist2, idx2 = nn_distance(xyz1, xyz2)
     config = tf.ConfigProto()
 
     #pylint: disable=no-member
     config.gpu_options.allow_growth = True
     config.allow_soft_placement = True
     sess = tf.Session(config=config)
-    
+
     pred_file_list = os.path.join(args.test_results_path, args.p2mpp_experiment_name, '*.xyz')
     xyz_list_path = glob.glob(pred_file_list)
 
@@ -55,9 +52,7 @@ if __name__ == '__main__':
         class_id = pred_path.split('/')[-1].split('_')[0]
         length[class_id] += 1.0
 
-        d1, i1, d2, i2 = sess.run([dist1, idx1, dist2, idx2], feed_dict={xyz1: predict, xyz2: ground})
-        cd_distance = np.mean(d1) + np.mean(d2)
-        sum_pred[class_id] += cd_distance
+        sum_pred[class_id] += chamfer_distance(predict, ground, session=sess)
 
         index += 1
         print('processed number', index, total_num)
