@@ -1,7 +1,8 @@
+import os
 import tensorflow as tf
 from tensorflow.python.framework import ops
 
-nn_distance_module = tf.load_op_library('./external/tf_nndistance_so.so')
+nn_distance_module = tf.load_op_library(os.path.join(os.environ["P2MPP_DIR"], 'source/external/tf_nndistance_so.so'))
 
 
 def nn_distance(xyz1, xyz2):

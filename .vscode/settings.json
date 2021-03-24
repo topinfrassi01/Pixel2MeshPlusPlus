@@ -1,4 +1,10 @@
 {
+    "search.exclude": {
+        "**/": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/unit_tests/tests/*": true
+    },
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
     "python.linting.lintOnSave": true,

@@ -1,4 +1,5 @@
 **__pycache__**
+unit_tests/tests/*
 results_train/*
 results_misc/*
 results_test/*

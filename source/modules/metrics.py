@@ -2,89 +2,28 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from scipy.spatial.distance import directed_hausdorff
 import tensorflow as tf
+import open3d as o3d
 import trimesh
 
 from modules.chamfer import nn_distance
 
-#pylint: disable=no-name-in-module
-from py_goicp import GoICP, POINT3D, ROTNODE, TRANSNODE
+def _rigid_register(source, dest, with_registration_results=False):
+    source_pc = o3d.geometry.PointCloud()
+    source_pc.points = o3d.utility.Vector3dVector(source)
 
-def _convert_np_to_point3D(arr):
-    points = []
-    for i in range(0, arr.shape[0]):
-        p = arr[i,:]
-        points.append(POINT3D(p[0], p[1], p[2]))
+    dest_pc = o3d.geometry.PointCloud()
+    dest_pc.points = o3d.utility.Vector3dVector(dest)
 
-    return points
+    #TODO : Figure out best param from threshold
+    threshold=2
+    reg_p2p = o3d.pipelines.registration.registration_icp(
+        source_pc, dest_pc, threshold, estimation_method=o3d.pipelines.registration.TransformationEstimationPointToPoint())
 
-def _normalize(points):
-    centroid = np.mean(points, axis=1)
-    points = points - centroid
+    if with_registration_results:
+        return np.asarray(dest_pc.transform(reg_p2p.transformation).points), reg_p2p    
 
-    maximum = np.max(np.abs(points), axis=1)
+    return np.asarray(dest_pc.transform(reg_p2p.transformation).points)
 
-    return points / maximum, maximum
-
-def _icp_rigid_register(source, dest):
-    ''' Taken from : https://github.com/aalavandhaann/go-icp_cython
-    '''
-
-    source = _convert_np_to_point3D(source)
-    dest = _convert_np_to_point3D(dest)
-
-    goicp = GoICP()
-    rNode = ROTNODE()
-    tNode = TRANSNODE()
-    
-    rNode.a = -3.1416
-    rNode.b = -3.1416
-    rNode.c = -3.1416
-    rNode.w = 6.2832
-    
-    tNode.x = -0.5
-    tNode.y = -0.5
-    tNode.z = -0.5
-    tNode.w = 1.0
-
-    goicp.MSEThresh = 0.001
-    goicp.trimFraction = 0.0
-    
-    if(goicp.trimFraction < 0.001):
-        goicp.doTrim = False
-
-    goicp.loadModelAndData(len(source), source, len(dest), dest)
-    #LESS DT Size = LESS TIME CONSUMPTION = HIGHER ERROR
-    goicp.setDTSizeAndFactor(300, 2.0)
-    goicp.setInitNodeRot(rNode)
-    goicp.setInitNodeTrans(tNode)
-    goicp.BuildDT()
-    goicp.Register()
-
-    optR = np.array(goicp.optimalRotation())
-    optT = goicp.optimalTranslation()
-    optT.append(1.0)
-    optT = np.array(optT)
-
-    transform = np.zeros((4,4))
-    transform[:3, :3] = optR
-    transform[:,3] = optT
-
-    homogeneous_dest = np.hstack(dest, np.ones((len(dest), 1)))
-
-    transform_model_points = np.matmul(transform, homogeneous_dest.transpose()).transpose()[:,:3]
-
-    return transform_model_points
-
-
-def _register_without_scale(source, dest):
-    source_normalized, _ = _normalize(source)
-    dest_normalized, dest_scale = _normalize(dest)
-
-    dest_registered = _icp_rigid_register(source_normalized, dest_normalized)
-    
-    dest_registered = dest_registered * dest_scale
-
-    return dest_registered
 
 def chamfer_distance(source, dest, session):
     xyz1 = tf.placeholder(tf.float32, shape=(None, 3))
@@ -120,10 +59,10 @@ def dice(source, dest, thresholds, session):
 
     return np.array(f_scores)
 
-def mean_surface_distance(source, dest, n_sample=None, registered=False):
-    #TODO : Check if we need/want to register before metrics
+
+def absolute_mean_surface_distance(source, dest, n_sample=None, registered=False):
     if not registered:
-        dest = _register_without_scale(source, dest)
+        dest = _rigid_register(source, dest)
 
     if n_sample:
         dest = np.random.permutation(dest)[:n_sample]
@@ -133,28 +72,26 @@ def mean_surface_distance(source, dest, n_sample=None, registered=False):
 
     distances, _ = nearest_neighbors.kneighbors(source)
 
-    return np.mean(np.square(distances), axis=0)
+    return np.mean(np.abs(distances), axis=0)
 
 
-def symmetric_mean_surface_distance(source, dest, n_sample=None, registered=False):
-    #TODO : Check if we need/want to register before metrics
-    mse_1 = mean_surface_distance(source, dest, n_sample, registered)
-    mse_2 = mean_surface_distance(source=dest, dest=source, n_sample=n_sample, registered=registered)
+def symmetric_absolute_mean_surface_distance(source, dest, n_sample=None, registered=False):
+    mse_1 = absolute_mean_surface_distance(source, dest, n_sample, registered)
+    mse_2 = absolute_mean_surface_distance(source=dest, dest=source, n_sample=n_sample, registered=registered)
 
     return (mse_1 * len(source) + mse_2 * len(dest)) / (len(source) + len(dest))
 
 
 def hausdorff(source, dest, registered=False):
-    #TODO : Check if we need/want to register before metrics
     if not registered:
-        dest = _register_without_scale(source, dest)
+        dest = _rigid_register(source, dest)
 
     return directed_hausdorff(source, dest)
 
+
 def symmetric_hausdorff(source, dest, registered=False):
-    #TODO : Check if we need/want to register before metrics
     if not registered:
-        dest = _register_without_scale(source, dest)
+        dest = _rigid_register(source, dest)
 
     return max(directed_hausdorff(source, dest), directed_hausdorff(dest, source))
 
@@ -163,10 +100,8 @@ def signed_mean_point_to_surface(points, vertices, faces, n_sample=None, registe
     ''' Tiré de : https://github.com/intel-isl/Open3D/issues/2062
     les points à l'extérieur ont une distance positives, intérieur négatives
     '''
-    
-    #TODO : Check if we need/want to register before metrics
     if not registered:
-        vertices = _register_without_scale(points, vertices)
+        vertices = _rigid_register(points, vertices)
 
     if n_sample:
         points = np.random.permutation(points)[:n_sample]
@@ -177,10 +112,9 @@ def signed_mean_point_to_surface(points, vertices, faces, n_sample=None, registe
     return np.mean(-sdf_tri_mesh.signed_distance(points))
 
 
-def mean_point_to_surface(points, vertices, faces, n_sample=None, registered=False):
-    #TODO : Check if we need/want to register before metrics
+def abs_mean_point_to_surface(points, vertices, faces, n_sample=None, registered=False):
     if not registered:
-        vertices = _register_without_scale(points, vertices)
+        vertices = _rigid_register(points, vertices)
 
     if n_sample:
         points = np.random.permutation(points)[:n_sample]
@@ -189,3 +123,16 @@ def mean_point_to_surface(points, vertices, faces, n_sample=None, registered=Fal
     sdf_tri_mesh = trimesh.proximity.ProximityQuery(tri_mesh_box)
 
     return np.mean(np.abs(sdf_tri_mesh.signed_distance(points)))
+
+
+def rms_point_to_surface(points, vertices, faces, n_sample=None, registered=False):
+    if not registered:
+        vertices = _rigid_register(points, vertices)
+
+    if n_sample:
+        points = np.random.permutation(points)[:n_sample]
+
+    tri_mesh_box = trimesh.Trimesh(vertices=vertices, faces=faces)
+    sdf_tri_mesh = trimesh.proximity.ProximityQuery(tri_mesh_box)
+
+    return np.sqrt(np.sum(sdf_tri_mesh.signed_distance(points))**2)/points.shape[0]
