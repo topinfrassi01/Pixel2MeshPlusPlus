@@ -158,8 +158,8 @@ class TestDiceDistance(unittest.TestCase):
         self.assertAlmostEqual(distance[0], 0, delta=0.001)
 
 
-class TestAbsoluteMeanSurfaceErrorDistance(unittest.TestCase):
-    def test(self):
+class TestMeanSurfaceErrorDistance(unittest.TestCase):
+    def test_amse(self):
         source = np.asarray([
             [1,1,1]
         ])
@@ -172,7 +172,7 @@ class TestAbsoluteMeanSurfaceErrorDistance(unittest.TestCase):
 
         self.assertAlmostEqual(distance, sqrt(3), delta=0.001)
 
-    def test_amse_averages(self):
+    def test_sym_amse(self):
         source = np.asarray([
             [1,1,1],
             [-1,-1,-1]
@@ -183,10 +183,20 @@ class TestAbsoluteMeanSurfaceErrorDistance(unittest.TestCase):
             [-2,-2,-2]
         ])
 
-        distance = metrics.absolute_mean_surface_distance(source, dest)
+        distance = metrics.symmetric_absolute_mean_surface_distance(source, dest)
 
-        self.assertAlmostEqual(distance, sqrt(3), delta=0.001)
+        self.assertAlmostEqual(distance, 2*sqrt(3), delta=0.001)
 
 
+class TestPointToSurfaceDistance(unittest.TestCase):
+    def test_signed_mp2s(self):
+        pass
+
+    def test_abs_p2s(self):
+        pass
+
+    def test_rms_p2s(self):
+        pass
+    
 if __name__ == '__main__':
     unittest.main()
