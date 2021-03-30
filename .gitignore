@@ -1,5 +1,6 @@
 **__pycache__**
 results_train/*
+gaussian_noise_img_changes/*
 results_misc/*
 results_test/*
 results_coarse/*
